@@ -1,0 +1,174 @@
+#!/usr/bin/env python3
+"""
+erdos-fc-sync — a computed source of truth for the Erdős proof-sync effort.
+
+The problem this solves is drift. A problem's "status" is stored in several places
+that update independently:
+
+  * erdosproblems.com (Bloom's upstream status)
+  * the Formal Conjectures repo (each file's @[category ...] annotation + formal_proof)
+  * plby/lean-proofs (which solved problems have a hosted Lean proof, and whether it
+    is conditional)
+
+Reconciling those by hand is what drifts. This script computes the status instead, by
+joining the three machine-readable sources on the problem number, plus the live set of
+open FC pull requests so it never points anyone at in-flight work. It writes STATUS.md.
+
+Sources (all fetched fresh):
+  fc     https://google-deepmind.github.io/formal-conjectures/data/conjectures.json
+  erdos  https://raw.githubusercontent.com/teorth/erdosproblems/main/data/problems.yaml
+  plby   https://raw.githubusercontent.com/plby/lean-proofs/main/data/sources.yaml
+  claims github.com/google-deepmind/formal-conjectures open PRs (REST API)
+
+Run: python fc-sync-status.py            (writes STATUS.md, prints the summary)
+A GitHub token in GH_TOKEN / GITHUB_TOKEN lets the open-PR (claims) layer run.
+"""
+import json, re, os, urllib.request, urllib.error, datetime
+import yaml
+
+UA = {"User-Agent": "erdos-fc-sync"}
+TOKEN = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+
+CONJ_URL = "https://google-deepmind.github.io/formal-conjectures/data/conjectures.json"
+ERDOS_URL = "https://raw.githubusercontent.com/teorth/erdosproblems/main/data/problems.yaml"
+PLBY_URL = "https://raw.githubusercontent.com/plby/lean-proofs/main/data/sources.yaml"
+REPO = "google-deepmind/formal-conjectures"
+
+
+def fetch(url, headers=None):
+    req = urllib.request.Request(url, headers={**UA, **(headers or {})})
+    with urllib.request.urlopen(req, timeout=90) as r:
+        return r.read()
+
+
+# --- erdos upstream status ------------------------------------------------
+erdos = {int(p["number"]): p for p in yaml.safe_load(fetch(ERDOS_URL))}
+
+# --- plby hosted proofs (presence => hosted; partial/conditional => not complete) --
+plby = {}
+for e in yaml.safe_load(fetch(PLBY_URL)):
+    m = re.search(r"Erdos(\d+)", e.get("key", ""))
+    if not m:
+        continue
+    n = int(m.group(1))
+    complete = not (e.get("partial") or e.get("conditional"))
+    rec = plby.setdefault(n, {"hosted": True, "complete": False})
+    rec["complete"] = rec["complete"] or complete
+
+# --- FC view: has a file? has a formal_proof link? ------------------------
+conj = json.loads(fetch(CONJ_URL))
+entries = []
+for v in conj.values():
+    entries.extend(v if isinstance(v, list) else [v])
+fc = {}
+for e in entries:
+    if not isinstance(e, dict):
+        continue
+    m = re.search(r"ErdosProblems/(\d+)\.lean", e.get("githubPath") or "")
+    if not m:
+        continue
+    rec = fc.setdefault(int(m.group(1)), {"has_file": True, "linked": False})
+    if e.get("hasFormalProof") and e.get("formalProofLink"):
+        rec["linked"] = True
+
+# --- claims: numbers touched by an open FC pull request -------------------
+def get_claims():
+    claimed, available = set(), False
+    hdr = {"Authorization": f"Bearer {TOKEN}"} if TOKEN else {}
+    try:
+        prs, page = [], 1
+        while True:
+            batch = json.loads(fetch(
+                f"https://api.github.com/repos/{REPO}/pulls?state=open&per_page=100&page={page}", hdr))
+            prs += batch
+            if len(batch) < 100:
+                break
+            page += 1
+        for pr in prs:
+            files = json.loads(fetch(
+                f"https://api.github.com/repos/{REPO}/pulls/{pr['number']}/files?per_page=100", hdr))
+            for f in files:
+                m = re.search(r"ErdosProblems/(\d+)\.lean", f.get("filename", ""))
+                if m:
+                    claimed.add(int(m.group(1)))
+        available = True
+    except (urllib.error.HTTPError, urllib.error.URLError):
+        pass  # rate-limited / no token: degrade, note it in the output
+    return claimed, available
+
+
+claimed, claims_available = get_claims()
+
+
+def action(n):
+    f = fc.get(n, {"has_file": False, "linked": False})
+    p = plby.get(n)
+    if f["linked"]:
+        return "done"
+    if not p:
+        return "no-proof"
+    if n in claimed:
+        return "in-pr"
+    if not p["complete"]:
+        return "docstring"
+    if f["has_file"]:
+        return "link"
+    return "statement"
+
+
+rows = [(n, action(n), erdos[n].get("status", {}).get("state", "?")) for n in sorted(erdos)]
+
+from collections import Counter
+counts = Counter(a for _, a, _ in rows)
+ORDER = ["statement", "link", "docstring", "in-pr", "done", "no-proof"]
+DESC = {
+    "statement": "**Write the FC statement + link.** A complete hosted proof exists, FC has no file yet. The #3998 batch.",
+    "link":      "**Add the `formal_proof` link.** FC already has the statement; the hosted proof just isn't linked.",
+    "docstring": "**Docstring note, not a `formal_proof` tag.** The hosted proof is conditional or partial.",
+    "in-pr":     "**Claimed.** An open FC pull request already touches this file.",
+    "done":      "Already linked in FC.",
+    "no-proof":  "No hosted Lean proof to link (nothing to do here yet).",
+}
+
+EPC = "https://www.erdosproblems.com"
+
+
+def md():
+    today = datetime.date.today().isoformat()
+    out = []
+    out.append("# Erdős ↔ Formal Conjectures sync status\n")
+    out.append(f"*Regenerated {today} by [`fc-sync-status.py`](fc-sync-status.py). "
+               "Do not edit by hand.*\n")
+    out.append(
+        "This is a **computed** view, not a hand-kept list. It joins three sources on the "
+        "problem number so the status can't drift:\n\n"
+        "- [erdosproblems.com](https://www.erdosproblems.com) status "
+        "([`problems.yaml`](https://github.com/teorth/erdosproblems/blob/main/data/problems.yaml))\n"
+        "- Formal Conjectures' own [`conjectures.json`](https://google-deepmind.github.io/formal-conjectures/data/conjectures.json) "
+        "(has-a-file + `formalProofLink`)\n"
+        "- [`plby/lean-proofs`](https://github.com/plby/lean-proofs/blob/main/data/sources.yaml) "
+        "(hosted proof + `conditional`/`partial`)\n\n"
+        "It also folds in the live set of open FC pull requests, so it never points at in-flight work.\n")
+    if not claims_available:
+        out.append("> ⚠️ The open-PR (claims) layer did not run this time (no token / rate limit), "
+                   "so `in-pr` may be undercounted.\n")
+    out.append(f"Reconciled **{len(rows)}** problems.\n")
+    out.append("| status | count | meaning |\n|---|---:|---|")
+    for a in ORDER:
+        out.append(f"| `{a}` | {counts.get(a,0)} | {DESC[a]} |")
+    out.append("")
+    for a in ("statement", "link", "docstring"):
+        ns = [n for n, x, _ in rows if x == a]
+        out.append(f"\n## `{a}` — {len(ns)} problem(s)\n\n{DESC[a]}\n")
+        out.append(" ".join(f"[{n}]({EPC}/{n})" for n in ns) or "_none_")
+    out.append("")
+    return "\n".join(out)
+
+
+with open("STATUS.md", "w") as f:
+    f.write(md())
+
+print(f"reconciled {len(rows)} problems; claims_available={claims_available}")
+for a in ORDER:
+    print(f"  {a:>10}: {counts.get(a,0)}")
+print("wrote STATUS.md")
