@@ -34,9 +34,9 @@ CONJ_URL = "https://google-deepmind.github.io/formal-conjectures/data/conjecture
 ERDOS_URL = "https://raw.githubusercontent.com/teorth/erdosproblems/main/data/problems.yaml"
 PLBY_URL = "https://raw.githubusercontent.com/plby/lean-proofs/main/data/sources.yaml"
 JAYY_URL = "https://raw.githubusercontent.com/Jayyhk/erdos-lean/main/data/problems.yaml"
-VLP_URL = "https://raw.githubusercontent.com/willblair0708/verified-lean-proofs/main/proofs.yaml"
+VLP_URL = "https://raw.githubusercontent.com/willblair0708/lean-proofs/main/proofs.yaml"
 REPO = "google-deepmind/formal-conjectures"
-SRC_TAG = {"plby": "ᵖ", "jayyhk": "ʲ", "vlp": "ᵛ"}
+SRC_TAG = {"plby": "ᵖ", "jayyhk": "ʲ", "vlp": "ʷ"}
 
 
 def fetch(url, headers=None):
@@ -82,7 +82,7 @@ for e in yaml.safe_load(fetch(JAYY_URL)):
     # Jayyhk: `complete` is clean; `axiomatic` / `trust_extended` are not axiom-clean.
     add_proof(n, state == "complete", state in ("axiomatic", "trust_extended"), False, "jayyhk")
 
-# verified-lean-proofs: own-hosted proofs whose `#print axioms` audit is enforced
+# lean-proofs: own-hosted proofs whose `#print axioms` audit is enforced
 # by CI. `axioms_clean: true` => complete (kernel axioms only, no sorry). Tolerant
 # of the repo not existing yet so the sync never breaks before it is published.
 try:
@@ -242,10 +242,10 @@ def md():
         "- hosted proofs from [`plby/lean-proofs`](https://github.com/plby/lean-proofs/blob/main/data/sources.yaml) (ᵖ), "
         "[`Jayyhk/erdos-lean`](https://github.com/Jayyhk/erdos-lean/blob/main/data/problems.yaml) (ʲ), "
         "with their `conditional` / `axiomatic` / `trust_extended` flags, and "
-        "[`willblair0708/verified-lean-proofs`](https://github.com/willblair0708/verified-lean-proofs/blob/main/proofs.yaml) (ᵛ), "
+        "[`willblair0708/lean-proofs`](https://github.com/willblair0708/lean-proofs/blob/main/proofs.yaml) (ʷ), "
         "whose `#print axioms` audit is CI-enforced\n\n"
         "It also folds in the live set of open FC pull requests, so it never points at in-flight work. "
-        "The ᵖ / ʲ / ᵛ marks after each problem show which collection hosts the proof.\n")
+        "The ᵖ / ʲ / ʷ marks after each problem show which collection hosts the proof.\n")
     if not claims_available:
         out.append("> ⚠️ The open-PR (claims) layer did not run this time (no token / rate limit), "
                    "so `in-pr` may be undercounted.\n")
