@@ -1,5 +1,11 @@
 # Human judgments that cannot be inferred from upstream machine-readable indexes.
 # Buckets here override the computed bucket unless FC already has a formal_proof link.
+#
+# An entry MAY also carry an optional `verdict:` key (faithful | variant | unfaithful)
+# when the judgment is specifically a statement-fidelity verdict. These are kept here
+# as human-readable mirrors; `compile_overrides_to_attestations.py` turns each into a
+# `vela attest faithfulness ...` command a human signs. The signed feed
+# (fidelity_cache.json / the hub snapshot) is the authority once present.
 
 45:
   bucket: blocked-claim
@@ -28,11 +34,13 @@
 
 205:
   bucket: hypothesis-conditional
+  verdict: variant
   reason: Treat as conditional until the hosted theorem is confirmed to have no non-problem hypothesis.
   source: https://github.com/google-deepmind/formal-conjectures/issues/3998
 
 214:
   bucket: mismatch
+  verdict: unfaithful
   reason: Hosted proof is complete, but proves an existential coloring result rather than the universal boxed problem.
   source: https://github.com/google-deepmind/formal-conjectures/issues/3998
 
@@ -43,6 +51,7 @@
 
 337:
   bucket: mismatch
+  verdict: unfaithful
   reason: Hosted proof is a counterexample/existence theorem and needs a fresh match-check before linking to the FC statement.
   source: https://github.com/google-deepmind/formal-conjectures/issues/3998
 
@@ -63,5 +72,6 @@
 
 1148:
   bucket: hypothesis-conditional
+  verdict: variant
   reason: Hosted theorem takes Duke's theorem as a hypothesis; #print axioms alone would not catch this.
   source: https://github.com/google-deepmind/formal-conjectures/issues/3998

@@ -15,6 +15,9 @@ An Erdős problem's "status" lives in several places that update independently:
   `complete` / `axiomatic` / `trust_extended` states.
 - **[willblair0708/lean-proofs](https://github.com/willblair0708/lean-proofs)** — a small
   CI-audited proof host whose manifest is checked by `#print axioms`.
+- **Statement-fidelity verdicts** — signed reviewer attestations of whether a formal theorem
+  faithfully states the boxed problem (`faithful` / `variant` / `unfaithful`). Read from a
+  snapshot URL when available, otherwise from a committed [`fidelity_cache.json`](fidelity_cache.json).
 - **Human review notes** — mismatch and claim judgments that live in issue comments or PR review,
   not in any upstream data feed.
 
@@ -68,6 +71,27 @@ machine-readable sources cannot know, such as:
 - a maintainer explicitly says not to link it (`wont-fix`).
 
 Do not hand-edit generated artifacts. Change `overrides.yaml` or the script, then regenerate.
+
+An override entry may also carry an optional `verdict:` key (`faithful` / `variant` /
+`unfaithful`) when the judgment is specifically a statement-fidelity verdict. These are kept as
+human-readable mirrors of the signed feed.
+
+## Statement fidelity
+
+A signed statement-fidelity feed records, per problem, whether a formal theorem faithfully states
+the boxed problem. The script reads it from a snapshot URL when reachable and otherwise from the
+committed [`fidelity_cache.json`](fidelity_cache.json); if neither is present the column is simply
+empty and the run still succeeds. A signed verdict supersedes the computed bucket and any matching
+`overrides.yaml` row.
+
+Two standalone helpers support the loop:
+
+- [`compile_overrides_to_attestations.py`](compile_overrides_to_attestations.py) — reads
+  `overrides.yaml` and prints the signing command for each entry carrying a `verdict:`. It signs
+  nothing; it only emits commands a human reviews and runs.
+- [`match_packet.py`](match_packet.py) — writes a three-panel review packet (upstream statement,
+  formal theorem, hosted theorem signature) to `packets/match-check/erdos_<n>.md` for a problem
+  or for every row still needing a match-check.
 
 ## Regenerate locally
 

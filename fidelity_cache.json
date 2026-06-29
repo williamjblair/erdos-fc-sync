@@ -1,0 +1,61 @@
+{
+  "_note": "Real signed statement_attestations from examples/erdos-formalization (reviewer:will-blair). Superseded by the live hub FIDELITY_URL once published.",
+  "statement_attestations": [
+    {
+      "attested_at": "2026-06-29T21:57:10.727193+00:00",
+      "attested_by": "reviewer:will-blair",
+      "formal_ref": "google-deepmind/formal-conjectures@HEAD:FormalConjectures/ErdosProblems/214.lean",
+      "formal_statement_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "id": "vsa_cce05f44f38a76ed",
+      "informal_ref": "erdosproblems.com/214",
+      "note": "Hosted proof is complete, but proves an existential coloring result rather than the universal boxed problem.",
+      "schema": "vela.statement_attestation.v0.1",
+      "signature": "cf84ad62f41d78ce477375284866e03fe4574206670748b0f09c4ec6453002f008cb653d8484281b7a699d93dfd52db7350678542a1d721fcb870783171a7c04",
+      "signer_pubkey_hex": "4892f93877e637b5f59af31d9ec6704814842fb278cacb0eb94704baef99455e",
+      "target": "vf_476e53ba112753c1",
+      "verdict": "unfaithful"
+    },
+    {
+      "attested_at": "2026-06-29T21:57:10.753324+00:00",
+      "attested_by": "reviewer:will-blair",
+      "formal_ref": "google-deepmind/formal-conjectures@HEAD:FormalConjectures/ErdosProblems/337.lean",
+      "formal_statement_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "id": "vsa_ffc0e460741d5d1b",
+      "informal_ref": "erdosproblems.com/337",
+      "note": "Hosted proof is a counterexample/existence theorem and needs a fresh match-check before linking to the FC statement.",
+      "schema": "vela.statement_attestation.v0.1",
+      "signature": "3bbf2a756328752bcfb2dc7cf34c049b7402ab1e7d42570d98576fa34d11bcfe332272e18b09a6cd5761d3a250e8b5404d0d5305a087c71786492cd461c68209",
+      "signer_pubkey_hex": "4892f93877e637b5f59af31d9ec6704814842fb278cacb0eb94704baef99455e",
+      "target": "vf_2ba3963823b23478",
+      "verdict": "unfaithful"
+    },
+    {
+      "attested_at": "2026-06-29T21:57:10.780480+00:00",
+      "attested_by": "reviewer:will-blair",
+      "formal_ref": "google-deepmind/formal-conjectures@HEAD:FormalConjectures/ErdosProblems/205.lean",
+      "formal_statement_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "id": "vsa_5d51352f74dfddf4",
+      "informal_ref": "erdosproblems.com/205",
+      "note": "Treat as conditional until the hosted theorem is confirmed to have no non-problem hypothesis.",
+      "schema": "vela.statement_attestation.v0.1",
+      "signature": "067fa84e74e5fe4061b8217cbf6d2ae406e8e60d85634ab60d4451b65048eb407e0c60bad8db5e13844888b5fccfbc3fdcddfe7c788b42eb56d810f1e2872c06",
+      "signer_pubkey_hex": "4892f93877e637b5f59af31d9ec6704814842fb278cacb0eb94704baef99455e",
+      "target": "vf_b9e82eeed266af04",
+      "verdict": "variant"
+    },
+    {
+      "attested_at": "2026-06-29T21:57:10.981906+00:00",
+      "attested_by": "reviewer:will-blair",
+      "formal_ref": "google-deepmind/formal-conjectures@HEAD:FormalConjectures/ErdosProblems/1148.lean",
+      "formal_statement_hash": "001fdfa65cf1289cdbeeb1e6cd16e7c53560342271e1eb2bc0b2d56b2be62dff",
+      "id": "vsa_0d768df62282d1e4",
+      "informal_ref": "erdosproblems.com/1148",
+      "note": "Hosted theorem takes Duke's theorem as a hypothesis; #print axioms alone would not catch this.",
+      "schema": "vela.statement_attestation.v0.1",
+      "signature": "d3c50de6d7d1469e15050cbda77662e85fa77009d82d01bf0006ab156f28189aacd14fed89f4eb944e74f5ee5e42b4577af65d6a4bb27a7f4dbf24ace86fe703",
+      "signer_pubkey_hex": "4892f93877e637b5f59af31d9ec6704814842fb278cacb0eb94704baef99455e",
+      "target": "vf_3b7922fd5410caac",
+      "verdict": "variant"
+    }
+  ]
+}

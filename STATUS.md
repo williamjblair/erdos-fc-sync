@@ -6,7 +6,7 @@ This is a **computed** view, not a hand-kept list. It joins erdosproblems.com, F
 
 Proof-source marks: ᵖ = [`plby/lean-proofs`](https://github.com/plby/lean-proofs), ʲ = [`Jayyhk/erdos-lean`](https://github.com/Jayyhk/erdos-lean), ʷ = [`willblair0708/lean-proofs`](https://github.com/willblair0708/lean-proofs).
 
-> ⚠️ **Coverage gap:** investigate [742](https://www.erdosproblems.com/742)
+**Coverage:** all 473 problems Bloom marks formalized are tracked by plby ∪ Jayyhk ∪ willblair0708/lean-proofs ∪ FC. No gap.
 
 Reconciled **1217** problems.
 
@@ -100,3 +100,14 @@ _none_
 **Deferred.** A human override says to leave this out of the next batch.
 
 _none_
+
+## statement fidelity — 4 signed verdict(s)
+
+Signed statement-fidelity verdicts: a reviewer attests whether the formal theorem faithfully states the boxed problem. A signed verdict supersedes the computed bucket and any matching `overrides.yaml` row.
+
+| problem | verdict | source | reviewer | theorem |
+|---|---|---|---|---|
+| [205](https://www.erdosproblems.com/205) | `variant` | cache | reviewer:will-blair | [theorem](https://www.erdosproblems.com/205) |
+| [214](https://www.erdosproblems.com/214) | `unfaithful` | cache | reviewer:will-blair | [theorem](https://www.erdosproblems.com/214) |
+| [337](https://www.erdosproblems.com/337) | `unfaithful` | cache | reviewer:will-blair | [theorem](https://www.erdosproblems.com/337) |
+| [1148](https://www.erdosproblems.com/1148) | `variant` | cache | reviewer:will-blair | [theorem](https://google-deepmind.github.io/formal-conjectures/theorem/?name=ErdosProblems.erdos_1148) |

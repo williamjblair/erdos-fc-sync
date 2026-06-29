@@ -25,8 +25,17 @@ ERDOS_URL = "https://raw.githubusercontent.com/teorth/erdosproblems/main/data/pr
 PLBY_URL = "https://raw.githubusercontent.com/plby/lean-proofs/main/data/sources.yaml"
 JAYY_URL = "https://raw.githubusercontent.com/Jayyhk/erdos-lean/main/data/problems.yaml"
 VLP_URL = "https://raw.githubusercontent.com/willblair0708/lean-proofs/main/proofs.yaml"
+# Statement-fidelity verdicts: signed attestations that a hosted/FC theorem
+# faithfully states the boxed problem. Primary read is the hub snapshot for the
+# erdos-formalization frontier (vfr_0a25edabc16db143); the committed
+# fidelity_cache.json is the offline fallback used until that frontier is
+# published (the loader 404-falls-back, then auto-switches once it is live).
+FIDELITY_URL = "https://hub.constellate.science/entries/vfr_0a25edabc16db143/snapshot"
+FIDELITY_CACHE = "fidelity_cache.json"
 FC_REPO = "google-deepmind/formal-conjectures"
 EPC = "https://www.erdosproblems.com"
+
+FIDELITY_VERDICTS = {"faithful", "variant", "unfaithful"}
 
 SOURCE_ORDER = ("plby", "jayyhk", "vlp")
 SRC_TAG = {"plby": "ᵖ", "jayyhk": "ʲ", "vlp": "ʷ"}
@@ -254,6 +263,83 @@ def build_fc(conjectures: dict) -> dict[int, dict]:
     return fc
 
 
+def _attestation_problem(attestation: dict) -> int | None:
+    """Derive the Erdős problem number from an attestation.
+
+    Prefer the trailing integer of ``informal_ref`` (e.g. ``erdosproblems.com/214``);
+    fall back to a trailing integer in ``target`` (e.g. ``vf_erdos_214``).
+    """
+    for field in ("informal_ref", "target"):
+        text = attestation.get(field) or ""
+        match = re.search(r"(\d+)\s*$", str(text))
+        if match:
+            return int(match.group(1))
+    return None
+
+
+def parse_fidelity(doc: dict | None, *, source: str) -> dict[int, dict]:
+    """Project a ``statement_attestations[]`` document onto problem number.
+
+    Returns ``{problem: {verdict, reviewer, formal_ref, formal_statement_hash,
+    note, signed, stale, source}}``. ``signed`` is True for real attestations;
+    ``source`` records hub-vs-cache provenance. ``stale`` is left ``None`` here
+    and resolved per-row once an FC theorem hash is available.
+    """
+    out: dict[int, dict] = {}
+    for attestation in (doc or {}).get("statement_attestations", []) or []:
+        if not isinstance(attestation, dict):
+            continue
+        verdict = attestation.get("verdict")
+        if verdict not in FIDELITY_VERDICTS:
+            continue
+        problem = _attestation_problem(attestation)
+        if problem is None:
+            continue
+        out[problem] = {
+            "verdict": verdict,
+            "reviewer": attestation.get("attested_by"),
+            "formal_ref": attestation.get("formal_ref"),
+            "formal_statement_hash": attestation.get("formal_statement_hash"),
+            "note": attestation.get("note"),
+            "signed": True,
+            "stale": None,
+            "source": source,
+        }
+    return out
+
+
+def load_fidelity(url_or_path: str | Path = FIDELITY_URL) -> dict[int, dict]:
+    """Load signed statement-fidelity verdicts keyed by problem number.
+
+    Primary read is the hub URL; on any network failure (matching the
+    ``vlp_doc`` fallback pattern) fall back to the committed
+    ``fidelity_cache.json``. If that is missing too, return ``{}`` so the
+    column is simply empty and the run still succeeds.
+    """
+    target = str(url_or_path)
+    if re.match(r"^https?://", target):
+        try:
+            return parse_fidelity(load_json_url(target), source="hub")
+        except (urllib.error.HTTPError, urllib.error.URLError, json.JSONDecodeError):
+            pass
+    else:
+        # An explicit local path was requested; treat it as last-known-good cache.
+        cache_path = Path(target)
+        if cache_path.exists():
+            try:
+                return parse_fidelity(json.loads(cache_path.read_text()), source="cache")
+            except (OSError, json.JSONDecodeError):
+                return {}
+        return {}
+    cache_path = Path(FIDELITY_CACHE)
+    if cache_path.exists():
+        try:
+            return parse_fidelity(json.loads(cache_path.read_text()), source="cache")
+        except (OSError, json.JSONDecodeError):
+            return {}
+    return {}
+
+
 def claims_headers() -> dict[str, str]:
     return {"Authorization": f"Bearer {TOKEN}"} if TOKEN else {}
 
@@ -333,6 +419,9 @@ def load_overrides(path: str | Path = "overrides.yaml") -> dict[int, dict]:
         bucket = value.get("bucket")
         if bucket and bucket not in OVERRIDE_BUCKETS:
             raise ValueError(f"unknown override bucket for {problem}: {bucket}")
+        verdict = value.get("verdict")
+        if verdict and verdict not in FIDELITY_VERDICTS:
+            raise ValueError(f"unknown override verdict for {problem}: {verdict}")
         overrides[problem] = value
     return overrides
 
@@ -348,9 +437,42 @@ def source_tags(proof: dict | None) -> str:
     return "".join(SRC_TAG[source] for source in source_names(proof))
 
 
-def classify(problem: int, fc: dict, proof: dict | None, claims: list[Claim], override: dict | None) -> str:
+def verdict_bucket(fidelity: dict | None, fc: dict) -> str | None:
+    """Map a signed statement-fidelity verdict to a bucket, or None.
+
+    Priority sits below ``fc.linked`` and above ``in-pr``/override/computed:
+    a signed verdict is direct human review of the statement match, so it
+    supersedes a machine-inferred bucket and a matching ``overrides.yaml`` row.
+    """
+    if not fidelity or not fidelity.get("signed"):
+        return None
+    verdict = fidelity.get("verdict")
+    note = (fidelity.get("note") or "").lower()
+    if verdict == "unfaithful":
+        return "mismatch"
+    if verdict == "variant":
+        if "variant" in note or "weaker" in note:
+            return "partial"
+        return "hypothesis-conditional"
+    if verdict == "faithful":
+        # The statement matches; the only remaining work is wiring the link.
+        return "link" if fc.get("has_file") else "statement"
+    return None
+
+
+def classify(
+    problem: int,
+    fc: dict,
+    proof: dict | None,
+    claims: list[Claim],
+    override: dict | None,
+    fidelity: dict | None = None,
+) -> str:
     if fc.get("linked"):
         return "done"
+    verdict = verdict_bucket(fidelity, fc)
+    if verdict:
+        return verdict
     if override and override.get("bucket") in OVERRIDE_BUCKETS:
         return override["bucket"]
     if claims:
@@ -366,6 +488,26 @@ def classify(problem: int, fc: dict, proof: dict | None, claims: list[Claim], ov
     return "needs-human-match-check"
 
 
+def fidelity_field(fidelity: dict | None, fc_data: dict) -> dict | None:
+    """Project the per-row ``fidelity`` view, computing staleness if possible."""
+    if not fidelity:
+        return None
+    stale = fidelity.get("stale")
+    expected = fidelity.get("formal_statement_hash")
+    # TODO: derive the current FC theorem hash to confirm staleness. The FC
+    # conjectures feed does not expose a per-theorem statement hash cheaply, so
+    # leave stale=None rather than guessing whether the statement drifted.
+    if expected is not None:
+        stale = None
+    return {
+        "verdict": fidelity.get("verdict"),
+        "reviewer": fidelity.get("reviewer"),
+        "formal_ref": fidelity.get("formal_ref"),
+        "source": fidelity.get("source"),
+        "stale": stale,
+    }
+
+
 def row_for_problem(
     problem: int,
     erdos_record: dict,
@@ -373,9 +515,10 @@ def row_for_problem(
     proof: dict | None,
     claims: list[Claim],
     override: dict | None,
+    fidelity: dict | None = None,
 ) -> dict:
     fc_data = fc_record or {"has_file": False, "linked": False, "path": None, "formal_proof_link": None}
-    bucket = classify(problem, fc_data, proof, claims, override)
+    bucket = classify(problem, fc_data, proof, claims, override, fidelity)
     sources = source_names(proof)
     proof_links = []
     if proof:
@@ -409,6 +552,7 @@ def row_for_problem(
         },
         "claims": [asdict(claim) for claim in claims],
         "override": override or None,
+        "fidelity": fidelity_field(fidelity, fc_data),
         "recommended_action": (override or {}).get("recommended_action") or RECOMMENDED_ACTION[bucket],
     }
 
@@ -421,9 +565,11 @@ def build_status(
     claims_by_problem: dict[int, list[Claim]],
     claims_available: bool,
     overrides: dict[int, dict],
+    fidelity: dict[int, dict] | None = None,
     generated_at: str | None = None,
 ) -> dict:
     generated_at = generated_at or _datetime.date.today().isoformat()
+    fidelity = fidelity or {}
     rows = [
         row_for_problem(
             problem,
@@ -432,6 +578,7 @@ def build_status(
             proofs.get(problem),
             claims_by_problem.get(problem, []),
             overrides.get(problem),
+            fidelity.get(problem),
         )
         for problem in sorted(erdos)
     ]
@@ -451,6 +598,7 @@ def build_status(
             "plby": PLBY_URL,
             "jayyhk": JAYY_URL,
             "vlp": VLP_URL,
+            "fidelity": FIDELITY_URL,
             "fc_repo": FC_REPO,
         },
         "counts": {bucket: counts.get(bucket, 0) for bucket in BUCKET_ORDER},
@@ -480,6 +628,51 @@ def format_problem_detail(row: dict) -> str:
     else:
         parts.append(row["recommended_action"])
     return " — ".join(parts)
+
+
+def fidelity_theorem_link(row: dict) -> str:
+    """Best-effort link to the FC theorem page; falls back to the erdos URL.
+
+    Derives the theorem-page query from the FC file path (``ErdosProblems/<n>.lean``)
+    when one is known; otherwise points at the upstream problem page so the link
+    is always live and never hand-written.
+    """
+    path = (row.get("fc") or {}).get("path") or ""
+    match = re.search(r"ErdosProblems/(\d+)\.lean", path)
+    if match:
+        name = urllib.parse.quote(f"ErdosProblems.erdos_{match.group(1)}")
+        return f"https://google-deepmind.github.io/formal-conjectures/theorem/?name={name}"
+    return row["erdos_url"]
+
+
+def fidelity_rows(payload: dict) -> list[dict]:
+    return [row for row in payload["rows"] if row.get("fidelity")]
+
+
+def render_fidelity_section(payload: dict) -> list[str]:
+    rows = sorted(fidelity_rows(payload), key=lambda row: row["problem"])
+    out: list[str] = []
+    out.append(f"\n## statement fidelity — {len(rows)} signed verdict(s)\n")
+    out.append(
+        "Signed statement-fidelity verdicts: a reviewer attests whether the formal "
+        "theorem faithfully states the boxed problem. A signed verdict supersedes the "
+        "computed bucket and any matching `overrides.yaml` row.\n"
+    )
+    if not rows:
+        out.append("_none_")
+        return out
+    out.append("| problem | verdict | source | reviewer | theorem |\n|---|---|---|---|---|")
+    for row in rows:
+        fidelity = row["fidelity"]
+        verdict = fidelity.get("verdict") or "?"
+        source = fidelity.get("source") or "?"
+        reviewer = fidelity.get("reviewer") or "—"
+        link = fidelity_theorem_link(row)
+        out.append(
+            f"| [{row['problem']}]({row['erdos_url']}) | `{verdict}` | {source} "
+            f"| {reviewer} | [theorem]({link}) |"
+        )
+    return out
 
 
 def render_status_md(payload: dict) -> str:
@@ -529,6 +722,7 @@ def render_status_md(payload: dict) -> str:
             out.append(" ".join(format_problem_inline(row) for row in rows))
         else:
             out.extend(f"- {format_problem_detail(row)}" for row in rows)
+    out.extend(render_fidelity_section(payload))
     out.append("")
     return "\n".join(out)
 
@@ -594,6 +788,7 @@ def load_live_status(overrides_path: str | Path = "overrides.yaml") -> dict:
     fc = build_fc(load_json_url(CONJ_URL))
     claims_by_problem, claims_available = fetch_claims()
     overrides = load_overrides(overrides_path)
+    fidelity = load_fidelity(FIDELITY_URL)
     for problem in fetch_wontfix():
         overrides.setdefault(
             problem,
@@ -610,6 +805,7 @@ def load_live_status(overrides_path: str | Path = "overrides.yaml") -> dict:
         claims_by_problem=claims_by_problem,
         claims_available=claims_available,
         overrides=overrides,
+        fidelity=fidelity,
     )
 
 

@@ -4,6 +4,8 @@ from fc_sync_status import (
     Claim,
     build_proofs,
     build_status,
+    load_fidelity,
+    parse_fidelity,
     render_next_batch_md,
     render_status_md,
 )
@@ -24,7 +26,7 @@ def complete_plby_proofs(*problems):
     return build_proofs([{"key": f"Erdos{problem}"} for problem in problems], [], {})
 
 
-def status_for(problem, *, proof=None, fc=None, claims=None, override=None):
+def status_for(problem, *, proof=None, fc=None, claims=None, override=None, fidelity=None):
     payload = build_status(
         erdos=erdos_records(problem),
         fc={problem: fc} if fc else {},
@@ -32,6 +34,7 @@ def status_for(problem, *, proof=None, fc=None, claims=None, override=None):
         claims_by_problem={problem: claims} if claims else {},
         claims_available=True,
         overrides={problem: override} if override else {},
+        fidelity={problem: fidelity} if fidelity else {},
         generated_at="2026-06-29",
     )
     return payload, payload["rows"][0]
@@ -153,3 +156,116 @@ def test_status_json_shape_and_rendered_artifacts_are_useful():
     assert "Problem 24" in next_batch_md
     assert "ErdosProblems/24" in next_batch_md
     assert "Problem 214" not in next_batch_md
+
+
+FIDELITY_DOC_214 = {
+    "statement_attestations": [
+        {
+            "id": "vsa_test214",
+            "target": "vf_erdos_214",
+            "verdict": "unfaithful",
+            "informal_ref": "erdosproblems.com/214",
+            "formal_ref": "google-deepmind/formal-conjectures@HEAD:ErdosProblems/214.lean",
+            "formal_statement_hash": "sha256:deadbeef",
+            "attested_by": "reviewer:will-blair",
+            "note": "proves an existential coloring result, not the universal boxed problem",
+            "signed_at": "2026-06-29T00:00:00Z",
+        }
+    ]
+}
+
+
+def test_parse_fidelity_keys_on_problem_and_marks_provenance():
+    parsed = parse_fidelity(FIDELITY_DOC_214, source="hub")
+
+    assert set(parsed) == {214}
+    record = parsed[214]
+    assert record["verdict"] == "unfaithful"
+    assert record["reviewer"] == "reviewer:will-blair"
+    assert record["signed"] is True
+    assert record["source"] == "hub"
+
+
+def test_fidelity_verdict_flows_to_mismatch_bucket_and_row_field():
+    fidelity = parse_fidelity(FIDELITY_DOC_214, source="hub")[214]
+
+    _, row = status_for(214, fidelity=fidelity)
+
+    assert row["bucket"] == "mismatch"
+    assert row["fidelity"] == {
+        "verdict": "unfaithful",
+        "reviewer": "reviewer:will-blair",
+        "formal_ref": "google-deepmind/formal-conjectures@HEAD:ErdosProblems/214.lean",
+        "source": "hub",
+        "stale": None,
+    }
+
+
+def test_signed_verdict_supersedes_a_matching_override():
+    fidelity = parse_fidelity(FIDELITY_DOC_214, source="cache")[214]
+
+    # An override would say defer; the signed unfaithful verdict wins -> mismatch.
+    _, row = status_for(
+        214,
+        fidelity=fidelity,
+        override={"bucket": "defer", "reason": "stale human note"},
+    )
+
+    assert row["bucket"] == "mismatch"
+    assert row["fidelity"]["source"] == "cache"
+
+
+def test_faithful_verdict_routes_to_link_when_fc_has_file_else_statement():
+    faithful = {
+        "verdict": "faithful",
+        "reviewer": "reviewer:will-blair",
+        "signed": True,
+        "note": "",
+        "source": "hub",
+    }
+
+    _, with_file = status_for(
+        24,
+        fc={"has_file": True, "linked": False, "path": "p", "formal_proof_link": None},
+        fidelity=faithful,
+    )
+    _, without_file = status_for(24, fidelity=dict(faithful))
+
+    assert with_file["bucket"] == "link"
+    assert without_file["bucket"] == "statement"
+
+
+def test_fidelity_section_renders_in_status_md():
+    fidelity = parse_fidelity(FIDELITY_DOC_214, source="cache")[214]
+    payload, _ = status_for(214, fidelity=fidelity)
+
+    status_md = render_status_md(payload)
+
+    assert "## statement fidelity" in status_md
+    assert "`unfaithful`" in status_md
+    assert "cache" in status_md
+
+
+def test_load_fidelity_missing_source_degrades_to_empty(tmp_path):
+    # A path that does not exist (the 404 analogue) yields an empty column.
+    missing = tmp_path / "no-such-fidelity.json"
+
+    assert load_fidelity(str(missing)) == {}
+
+
+def test_missing_fidelity_leaves_row_field_empty_without_crashing():
+    proof = complete_plby_proofs(24)[24]
+
+    _, row = status_for(24, proof=proof, fidelity=None)
+
+    assert row["fidelity"] is None
+    assert row["bucket"] == "statement"
+
+
+def test_load_fidelity_reads_committed_cache_file():
+    # The committed fidelity_cache.json is the offline fallback / seed.
+    cached = load_fidelity("fidelity_cache.json")
+
+    assert 214 in cached
+    assert cached[214]["source"] == "cache"
+    assert cached[214]["signed"] is True
