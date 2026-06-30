@@ -2,9 +2,9 @@
 """Parse the frozen teorth/erdosproblems "AI contributions" wiki into a registry.
 
 The wiki was frozen on 2026-06-30 ("no longer updated"). We commit the source
-markdown under wiki_snapshot/ and re-derive wiki_registry.json from it here, so
-the registry is reproducible offline and never silently drifts. fc_sync_status
-reads only the committed JSON; it never clones the wiki at runtime.
+markdown alongside this script and re-derive registry.json from it here, so the
+registry is reproducible offline and never silently drifts. erdos_frontier reads
+only the committed JSON; it never clones the wiki at runtime.
 
 Source: teorth/erdosproblems wiki, AI-contributions-to-Erdős-problems
         (wiki commit c8ad430, 2026-06-30).
@@ -17,8 +17,8 @@ import pathlib
 import re
 
 HERE = pathlib.Path(__file__).resolve().parent
-SRC = HERE / "wiki_snapshot" / "AI-contributions.md"
-OUT = HERE / "wiki_registry.json"
+SRC = HERE / "AI-contributions.md"
+OUT = HERE / "registry.json"
 
 WIKI_COMMIT = "c8ad4309d20120c67cb97faa86daa1443acee018"
 FROZEN_AT = "2026-06-30"

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Compute the Erdős ↔ Formal Conjectures proof-sync dashboard."""
+"""Build the Erdős frontier audit: join the proof corpora, the machine fidelity
+verdicts, the frozen wiki, and the gpt-erdos claims into status.json / verdicts.json
+(the public feed) and the human-readable STATUS.md / NEXT_BATCH.md."""
 
 from __future__ import annotations
 
@@ -31,7 +33,7 @@ VLP_URL = "https://raw.githubusercontent.com/williamjblair/lean-proofs/main/proo
 # fidelity_cache.json is the offline fallback used until that frontier is
 # published (the loader 404-falls-back, then auto-switches once it is live).
 FIDELITY_URL = "https://hub.constellate.science/entries/vfr_0a25edabc16db143/snapshot"
-FIDELITY_CACHE = "fidelity_cache.json"
+FIDELITY_CACHE = "sources/fidelity_cache.json"
 FC_REPO = "google-deepmind/formal-conjectures"
 EPC = "https://www.erdosproblems.com"
 
@@ -305,7 +307,7 @@ def apply_machine_audit(proofs: dict[int, dict], audit: dict[int, dict]) -> None
             rec["complete"] = not rec.get("partial")
 
 
-WIKI_REGISTRY_PATH = Path(__file__).resolve().parent / "wiki_registry.json"
+WIKI_REGISTRY_PATH = Path(__file__).resolve().parent / "sources/wiki/registry.json"
 WIKI_SOURCE = ("https://github.com/teorth/erdosproblems/wiki/"
                "AI-contributions-to-Erd%C5%91s-problems")
 
@@ -350,8 +352,8 @@ def load_wiki_registry(path: Path = WIKI_REGISTRY_PATH) -> dict[int, dict]:
     The wiki is the registry this audit is a superset of: it carries the claim
     (which AI, which humans, what outcome colour) but never the conditionality of
     the underlying proof — the column this audit adds. Re-derived offline from the
-    committed ``wiki_snapshot/`` markdown by ``wiki_snapshot.py``; this reads only
-    the resulting ``wiki_registry.json``. Empty if the snapshot is absent.
+    committed ``sources/wiki/`` markdown by ``sources/wiki/snapshot.py``; this reads
+    only the resulting ``sources/wiki/registry.json``. Empty if the snapshot is absent.
     """
     try:
         doc = json.load(open(path, encoding="utf-8"))
@@ -367,7 +369,7 @@ def load_wiki_registry(path: Path = WIKI_REGISTRY_PATH) -> dict[int, dict]:
     return out
 
 
-CANDIDATE_CLAIMS_PATH = Path(__file__).resolve().parent / "gpt_erdos_registry.json"
+CANDIDATE_CLAIMS_PATH = Path(__file__).resolve().parent / "sources/gpt_erdos/registry.json"
 CANDIDATE_SOURCE = "https://github.com/neelsomani/gpt-erdos"
 
 
@@ -915,8 +917,8 @@ def render_fidelity_section(payload: dict) -> list[str]:
 
 def render_status_md(payload: dict) -> str:
     out: list[str] = []
-    out.append("# Erdős ↔ Formal Conjectures sync status\n")
-    out.append(f"*Regenerated {payload['generated_at']} by [`fc-sync-status.py`](fc-sync-status.py). Do not edit by hand.*\n")
+    out.append("# Erdős frontier — proof status\n")
+    out.append(f"*Regenerated {payload['generated_at']} by [`erdos_frontier.py`](erdos_frontier.py). Do not edit by hand.*\n")
     out.append(
         "This is a **computed** view, not a hand-kept list. It joins erdosproblems.com, "
         "Formal Conjectures, hosted Lean proof indexes, live open PRs, and explicit human "
@@ -1137,4 +1139,8 @@ def main() -> int:
         print(f"  {bucket:>24}: {payload['counts'].get(bucket, 0)}")
     print("wrote STATUS.md, status.json, NEXT_BATCH.md, verdicts.json")
     return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
 

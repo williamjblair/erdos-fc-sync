@@ -9,7 +9,7 @@ Vela L1 assumption-extractor harness, multi-repo / multi-toolchain.
 
 Each proof repo pins its own Lean toolchain and lives at its own root; the same
 metaprogram runs against each (it operates on decl-name strings, not Lean versions).
-A repo's feed is tagged so fc_sync_status can merge feeds and keep the strongest
+A repo's feed is tagged so erdos_frontier can merge feeds and keep the strongest
 verdict per problem. The machine layer (L0/L1) only — verdicts are facts, not human
 judgment.
 
@@ -138,7 +138,7 @@ def discover(cfg: dict, root: pathlib.Path) -> dict:
         if not keep:
             continue
         # last file per problem number wins (e.g. Erdos1100b over Erdos1100), as
-        # before; cross-repo strongest-verdict merge lives in fc_sync_status.
+        # before; cross-repo strongest-verdict merge lives in erdos_frontier.
         by_num[num] = {
             "module": [module_of(f, root)],
             "decls": [f"{ns}.{t}" for t in keep],

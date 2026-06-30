@@ -1,7 +1,7 @@
 # Staging gate — human clearances for celebrated-proof flags.
 #
 # A mechanical conditional/incomplete flag on a celebrated AI-solved proof
-# (CELEBRATED_PROBLEMS in fc_sync_status.py: AlphaProof's set + the Aristotle/GPT
+# (CELEBRATED_PROBLEMS in erdos_frontier.py: AlphaProof's set + the Aristotle/GPT
 # trio) is HELD out of the public feed until a human loads the actual proof and
 # confirms the flag is real. List a problem number here once you have verified its
 # flag by hand; only then does it publish as a discrepancy.

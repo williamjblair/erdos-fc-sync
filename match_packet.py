@@ -10,7 +10,7 @@ A packet is a markdown artifact with three panels for a reviewer to compare:
 The reviewer reads all three and decides whether the formal theorem faithfully
 states the boxed problem. Packets are written to packets/match-check/erdos_<n>.md.
 
-Reuses the dashboard's own row builders (row_for_problem / build_fc /
+Reuses the audit's own row builders (row_for_problem / build_fc /
 build_proofs / proof_url) so the packet never drifts from the computed status.
 
 Usage:
@@ -24,7 +24,7 @@ import json
 from pathlib import Path
 import sys
 
-from fc_sync_status import (
+from erdos_frontier import (
     SOURCE_LABEL,
     load_live_status,
 )

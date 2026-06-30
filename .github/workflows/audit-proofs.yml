@@ -70,7 +70,7 @@ jobs:
         run: |
           uv run python lean_assumptions/extract_assumptions.py --repo plby
           uv run python lean_assumptions/extract_assumptions.py --repo alphaproof
-          uv run python fc-sync-status.py
+          uv run python erdos_frontier.py
           uv run pytest -q
 
       - name: Commit regenerated feeds if changed

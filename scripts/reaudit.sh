@@ -21,6 +21,6 @@ echo "==> alphaproof-nexus (Lean 4.27.0)"
 python3 lean_assumptions/extract_assumptions.py --repo alphaproof
 
 echo "==> regenerate the join (status.json + verdicts.json + STATUS.md + packets feed)"
-python3 fc-sync-status.py
+python3 erdos_frontier.py
 
 echo "re-audit complete: audit_feed*.json + status regenerated."

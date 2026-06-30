@@ -1,6 +1,6 @@
 import json
 
-from fc_sync_status import (
+from erdos_frontier import (
     Claim,
     _wiki_summary,
     apply_machine_audit,
@@ -297,8 +297,8 @@ def test_missing_fidelity_leaves_row_field_empty_without_crashing():
 
 
 def test_load_fidelity_reads_committed_cache_file():
-    # The committed fidelity_cache.json is the offline fallback / seed.
-    cached = load_fidelity("fidelity_cache.json")
+    # The committed sources/fidelity_cache.json is the offline fallback / seed.
+    cached = load_fidelity("sources/fidelity_cache.json")
 
     assert 214 in cached
     assert cached[214]["source"] == "cache"
@@ -375,7 +375,7 @@ def test_row_without_wiki_entry_has_no_claim_or_discrepancy():
 
 
 def test_load_wiki_registry_reads_committed_snapshot():
-    # The committed wiki_registry.json is the frozen-wiki seed.
+    # The committed sources/wiki/registry.json is the frozen-wiki seed.
     reg = load_wiki_registry()
     assert 728 in reg
     assert reg[728]["claims_full_solution"] is True
@@ -442,7 +442,7 @@ def test_non_celebrated_conditional_flag_is_not_held():
 
 # --- gpt-erdos: independent human classification, cross-referenced -----------
 
-def test_load_candidate_claims_reads_gpt_erdos_snapshot():
+def test_load_candidate_claims_reads_gpt_erdos_registry():
     claims = load_candidate_claims()
     assert claims[281]["category"] == "new_proof"   # Neel credits a new GPT proof
     assert claims[281]["source"] == "gpt-erdos"

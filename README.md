@@ -34,7 +34,7 @@ An Erdős problem's "status" lives in several places that update independently:
   CI-audited proof host whose manifest is checked by `#print axioms`.
 - **Statement-fidelity verdicts** — signed reviewer attestations of whether a formal theorem
   faithfully states the boxed problem (`faithful` / `variant` / `unfaithful`). Read from a
-  snapshot URL when available, otherwise from a committed [`fidelity_cache.json`](fidelity_cache.json).
+  snapshot URL when available, otherwise from a committed [`sources/fidelity_cache.json`](sources/fidelity_cache.json).
 - **Human review notes** — mismatch and claim judgments that live in issue comments or PR review,
   not in any upstream data feed.
 
@@ -44,17 +44,36 @@ boxed statement).
 
 ## What this does
 
-[`fc-sync-status.py`](fc-sync-status.py) computes the status instead of tracking it. It fetches
-the sources fresh, joins them on the problem number, folds in live open FC pull requests, applies
-explicit human overrides from [`overrides.yaml`](overrides.yaml), and writes generated artifacts.
-A GitHub Action runs tests and regenerates the artifacts daily.
+[`erdos_frontier.py`](erdos_frontier.py) computes the audit instead of tracking it. It fetches the
+proof corpora and erdos/FC status fresh, folds in the machine fidelity verdicts
+([`lean_assumptions/`](lean_assumptions/)), the frozen-wiki and gpt-erdos claim snapshots
+([`sources/`](sources/)), live open FC pull requests, human overrides
+([`overrides.yaml`](overrides.yaml)), and any signed reviewer verdicts, then writes the generated
+artifacts. A GitHub Action regenerates them daily; the heavier Lean re-audit
+([`scripts/reaudit.sh`](scripts/reaudit.sh)) runs on demand.
 
-Generated files:
+Generated artifacts (do not edit by hand):
 
-- **[STATUS.md](STATUS.md)** — human-readable dashboard and bucket counts.
-- **[status.json](status.json)** — machine-readable rows for agents and scripts.
-- **[NEXT_BATCH.md](NEXT_BATCH.md)** — ranked safe `statement` candidates with proof links and
-  anti-collision commands.
+- **[verdicts.json](verdicts.json)** — the public audit feed, one row per problem, that the
+  [live page](index.html) renders.
+- **[STATUS.md](STATUS.md)** / **[status.json](status.json)** — the proof-status join and bucket counts.
+- **[NEXT_BATCH.md](NEXT_BATCH.md)** — ranked safe `statement` candidates to link into FC.
+
+## Layout
+
+```
+erdos_frontier.py     the audit: fetch, join, classify, render (importable + runnable)
+match_packet.py       human-review packets for the discrepancies (you sign, no AI signs)
+index.html            the live page (fetches verdicts.json)
+sources/              ingested claim sources, snapshotted + reproducible offline
+  wiki/               the frozen teorth AI-contributions wiki + its parser
+  gpt_erdos/          neelsomani/gpt-erdos classification + its parser
+  fidelity_cache.json offline fallback for signed statement-fidelity verdicts
+lean_assumptions/     the L1 Lean assumption-extractor (multi-toolchain) + its feeds
+overrides.yaml        the only hand-maintained classification input
+staging_cleared.yaml  human clearances for held celebrated-proof flags
+scripts/reaudit.sh    re-run the heavy Lean audit and regenerate the feeds
+```
 
 ## The status categories
 
@@ -93,13 +112,13 @@ Do not hand-edit generated artifacts. Change `overrides.yaml` or the script, the
 
 A signed statement-fidelity feed records, per problem, whether a formal theorem faithfully states
 the boxed problem. The script reads it from a snapshot URL when reachable and otherwise from the
-committed [`fidelity_cache.json`](fidelity_cache.json); if neither is present the column is simply
-empty and the run still succeeds. A signed verdict supersedes the computed bucket and any matching
-`overrides.yaml` row.
+committed [`sources/fidelity_cache.json`](sources/fidelity_cache.json); if neither is present the
+column is simply empty and the run still succeeds. A signed verdict supersedes the computed bucket
+and any matching `overrides.yaml` row.
 
-Verdicts are signed with `vela attest faithfulness` against the `erdos-formalization` Vela frontier
-(only a human reviewer can sign one); they are not stored in this repo. Review the match-check
-packet before signing:
+Verdicts are signed with `vela attest` (per-target `--verdict`, or `--batch` for a filled file)
+against the `erdos-formalization` Vela frontier — only a human reviewer can sign one, no AI signs;
+they are not stored in this repo. Review the packet before signing:
 
 - [`match_packet.py`](match_packet.py) — writes a three-panel review packet (upstream statement,
   formal theorem, hosted theorem signature) to `packets/match-check/erdos_<n>.md` for a problem
@@ -110,7 +129,7 @@ packet before signing:
 ```sh
 uv sync --all-groups
 uv run pytest
-GH_TOKEN=$(gh auth token) uv run python fc-sync-status.py
+GH_TOKEN=$(gh auth token) uv run python erdos_frontier.py
 uv run python -m json.tool status.json >/dev/null
 ```
 
@@ -119,16 +138,16 @@ else still computes.
 
 ## Development
 
-The CLI wrapper is [`fc-sync-status.py`](fc-sync-status.py). The importable implementation is
-[`fc_sync_status.py`](fc_sync_status.py), so tests can exercise classification and rendering
-without network access.
+[`erdos_frontier.py`](erdos_frontier.py) is both the importable implementation — so tests can
+exercise classification and rendering without network access — and the entrypoint
+(`python erdos_frontier.py`). The tests are in [`tests/`](tests/).
 
 Before pushing:
 
 ```sh
 uv sync --all-groups
 uv run pytest
-GH_TOKEN=$(gh auth token) uv run python fc-sync-status.py
+GH_TOKEN=$(gh auth token) uv run python erdos_frontier.py
 uv run python -m json.tool status.json >/dev/null
 git diff --check
 ```

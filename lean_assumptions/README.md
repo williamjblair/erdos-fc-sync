@@ -17,13 +17,20 @@ the gap this layer closes.
 
 ## Run
 
-    VELA_PROOF_REPO=/path/to/lean-proofs/src/v4.29.1 python3 extract_assumptions.py
+    python3 extract_assumptions.py --repo plby         # default; the v4.29.1 fork
+    python3 extract_assumptions.py --repo alphaproof   # alphaproof-nexus, Lean 4.27.0
 
-Discovers headline theorems per problem, generates `extract_all.lean` (imports the
-built modules, robust to missing decls), runs it under `lake env lean`, and writes:
+Each repo is loaded in its own built `.lake` at its own pinned Lean toolchain (override
+the root with the per-repo `VELA_PROOF_REPO[_<TAG>]` env var). For each, the harness
+discovers headline theorems per problem, generates a transient `extract_<tag>.lean`
+(imports the built modules, robust to missing decls; git-ignored), runs it under
+`lake env lean`, and writes:
 
-- `assumptions.jsonl` — one L1 record per theorem.
-- `audit_feed.json` — one row per problem (joined with `../status.json`).
+- `assumptions[_<tag>].jsonl` — one L1 record per theorem.
+- `audit_feed[_<tag>].json` — one row per problem (joined with `../status.json`).
+
+`erdos_frontier` merges every `audit_feed*.json`, keeping the strongest verdict per
+problem with provenance. To rebuild every feed at once, use `scripts/reaudit.sh`.
 
 Neutral: no Vela dependency. The signed/replayable tier lives in the Vela frontier;
 this is the public machine-evidence generator.

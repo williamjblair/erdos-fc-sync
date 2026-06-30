@@ -7,7 +7,7 @@ constraints, conditional on a conjecture, subtle error, ...). It is a CLAIMS sou
 not a proof corpus — its value here is cross-referencing an independent human review
 against this audit's mechanical proof verdicts. We snapshot the README (frozen at the
 recorded commit; the repo has not changed since 2026-01-25) and re-derive the registry
-offline; fc_sync_status reads only the JSON.
+offline; erdos_frontier reads only the JSON.
 
 Source: neelsomani/gpt-erdos README "Findings" table (commit 21b48ae, 2026-01-25).
 """
@@ -19,8 +19,8 @@ import pathlib
 import re
 
 HERE = pathlib.Path(__file__).resolve().parent
-SRC = HERE / "gpt_erdos_snapshot" / "README.md"
-OUT = HERE / "gpt_erdos_registry.json"
+SRC = HERE / "README.md"
+OUT = HERE / "registry.json"
 
 GPT_ERDOS_COMMIT = "21b48ae6b97279e9fe6781e3744e1cdd835e2cc1"
 SNAPSHOT_AT = "2026-01-25"
