@@ -1,6 +1,6 @@
 {
   "problem": 24,
-  "status": "staged",
+  "status": "drafted",
   "staged_at": "2026-07-01T20:38:44+00:00",
   "upstream_state": "proved (Lean)",
   "latex_sha256": "6439096b1928c2b6a5823d86e84ce490dc0daae0d863df3435a1d8ad4989b26b",
@@ -35,5 +35,12 @@
       }
     ]
   },
-  "divergence_notes": []
+  "divergence_notes": [
+    "Count vocabulary: draft uses Mathlib's SimpleGraph.copyCount G (cycleGraph 5) (number of subgraphs of G isomorphic to C5); both hosted proofs define numC5 G = #{labelled C5 maps Fin 5 -> V} / 10 (labelled embeddings divided by |D5| = 10). The two counts are equal on every graph (each C5-subgraph carries exactly 10 labellings), so this is neither a strengthening nor a weakening.",
+    "Form: draft wraps the statement as answer(True) <-> forall n G, ... (FC house style for solved yes/no questions); hosted are bare theorems parametrised by (n : Nat) (G : SimpleGraph (Fin (5 * n))) (hG : G.CliqueFree 3). Same content.",
+    "Triangle-free rendered as G.CliqueFree 3 and vertex type Fin (5 * n) in draft and in both hosted final theorems -- no divergence on either.",
+    "Hosted-vs-hosted: final statements agree modulo naming (plby erdos_pentagon_conjecture vs jayyhk erdos_24) and namespacing of numC5. No disagreement. Note: the inputs.md extracts showed only intermediate flag-algebra lemmas (flag_bound_all_graphs / flag_bound_with_c5); the final theorems were read from the full hosted files."
+  ],
+  "ams_rationale": "AMS 5 (combinatorics): extremal graph theory, counting C5 subgraphs in triangle-free graphs; matches FC graph problems 61/85.",
+  "category": "research solved"
 }

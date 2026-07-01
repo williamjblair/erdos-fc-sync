@@ -21,19 +21,36 @@ import FormalConjectures.Util.ProblemImports
 
 *References:*
 - [erdosproblems.com/429](https://www.erdosproblems.com/429)
-<!-- DRAFTER: add cited papers from the solution line, [Xx00] style -->
+- [Er80] Erdős, Paul, *A survey of problems in combinatorial number theory*.
+  Ann. Discrete Math. (1980), 89-115.
+- [We24] D. Weisenberg, *Sparse Admissible Sets and a Problem of Erdős and Graham*.
+  Integers (2024).
 -/
+
+open Filter
 
 namespace Erdos429
 
 /--
-<!-- DRAFTER: the boxed problem text VERBATIM from inputs.md (do not rephrase);
-     for solved problems add the verbatim solution sentence + citations. -->
+Is it true that, if $A\subseteq \mathbb{N}$ is sparse enough and does not cover all residue
+classes modulo $p$ for any prime $p$, then there exists some $n$ such that $n+a$ is prime for
+all $a\in A$?
+
+Weisenberg [We24] has shown the answer is no: $A$ can be arbitrarily sparse and missing at
+least one residue class modulo every prime $p$, and yet $A+n$ is not contained in the primes
+for any $n\in \mathbb{Z}$. (Weisenberg gives several constructions of such an $A$.)
+
+The statement below formalizes "sparse enough" via a threshold: is there some
+$f:\mathbb{N}\to\mathbb{N}$ with $f(N)\to\infty$ such that every infinite $A$ with
+$\lvert A\cap[1,N]\rvert\leq f(N)$ for all $N$, missing a residue class modulo every prime,
+admits such an $n$? Weisenberg's constructions refute this for every choice of $f$.
 -/
 @[category research solved, AMS 11]
-<!-- DRAFTER: fix AMS tags; add `formal_proof using lean4 at "<pinned-url>"`
-     ONLY if draft.json says link_allowed=true -->
-theorem erdos_429 : answer(sorry) := by
+theorem erdos_429 : answer(False) ↔
+    ∃ f : ℕ → ℕ, Tendsto f atTop atTop ∧
+      ∀ A : Set ℕ, A.Infinite → (∀ N, (A ∩ Set.Icc 1 N).ncard ≤ f N) →
+        (∀ p : ℕ, p.Prime → ∃ b : ZMod p, ∀ a ∈ A, (a : ZMod p) ≠ b) →
+        ∃ n : ℕ, ∀ a ∈ A, (n + a).Prime := by
   sorry
 
 end Erdos429

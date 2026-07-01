@@ -21,19 +21,34 @@ import FormalConjectures.Util.ProblemImports
 
 *References:*
 - [erdosproblems.com/24](https://www.erdosproblems.com/24)
-<!-- DRAFTER: add cited papers from the solution line, [Xx00] style -->
+- [Er92b] Erdős, Paul, *Some of my favourite problems in various branches of combinatorics*.
+  Matematiche (Catania) (1992), 231-240.
+- [Er97f] Erdős, Paul, *Some unsolved problems*. Combinatorics, geometry and probability
+  (Cambridge, 1993) (1997), 1-10.
+- [Gr12] Grzesik, Andrzej, *On the maximum number of five-cycles in a triangle-free graph*.
+  J. Combin. Theory Ser. B (2012), 1061-1066.
+- [HHKNR13] Hatami, Hamed and Hladký, Jan and Kráľ, Daniel and Norine, Serguei and Razborov,
+  Alexander, *On the number of pentagons in triangle-free graphs*. J. Combin. Theory Ser. A
+  (2013), 722-732.
 -/
+
+open SimpleGraph
 
 namespace Erdos24
 
 /--
-<!-- DRAFTER: the boxed problem text VERBATIM from inputs.md (do not rephrase);
-     for solved problems add the verbatim solution sentence + citations. -->
+Does every triangle-free graph on $5n$ vertices contain at most $n^5$ copies of $C_5$?
+
+Győri proved this with $1.03n^5$, which has been improved by Füredi. The answer is yes, as proved
+independently by Grzesik [Gr12] and Hatami, Hladky, Král, Norine, and Razborov [HHKNR13].
+
+Copies of $C_5$ are counted as subgraphs isomorphic to the cycle graph on five vertices,
+i.e. by `SimpleGraph.copyCount`.
 -/
-@[category research solved, AMS 11]
-<!-- DRAFTER: fix AMS tags; add `formal_proof using lean4 at "<pinned-url>"`
-     ONLY if draft.json says link_allowed=true -->
-theorem erdos_24 : answer(sorry) := by
+@[category research solved, AMS 5]
+theorem erdos_24 : answer(True) ↔
+    ∀ (n : ℕ) (G : SimpleGraph (Fin (5 * n))), G.CliqueFree 3 →
+      G.copyCount (cycleGraph 5) ≤ n ^ 5 := by
   sorry
 
 end Erdos24

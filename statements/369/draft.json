@@ -1,6 +1,6 @@
 {
   "problem": 369,
-  "status": "staged",
+  "status": "drafted",
   "staged_at": "2026-07-01T20:38:53+00:00",
   "upstream_state": "proved (Lean)",
   "latex_sha256": "e4a56d6dfe15b8563c1788b041cf946d1ccc8e7b2fca7356778bf0ce6beb0614",
@@ -27,9 +27,19 @@
     "issues": [
       {
         "number": 697,
-        "title": "Erd\u0151s Problem 369"
+        "title": "Erdős Problem 369"
       }
     ]
   },
-  "divergence_notes": []
+  "category": "research solved",
+  "ams_rationale": "11 (number theory: smooth numbers / distribution of integers free of large prime factors, 11N25)",
+  "divergence_notes": [
+    "INTERPRETATION (statement vs problem text): the text as written is trivially true (the site commentary itself says so: take {1,...,k} and n > k^{1/eps}). The drafted statement formalizes the commentary's SECOND non-trivial variant -- the k consecutive integers must lie in [n/2, n] -- which is what the upstream 'proved (Lean)' status refers to (SkyYang via the Balog-Wooley construction) and what BOTH hosted theorems prove. The literal text has no [n/2,n] constraint; the window is a strengthening taken from the site commentary and is documented in the docstring.",
+    "HOSTED-vs-HOSTED disagreement on the smoothness bound: jayyhk bounds every prime factor by N^eps (the problem text's n^eps-smooth); plby bounds prime factors of each element m = a - j by m^eps ((a-j)^eps), i.e. the commentary's FIRST variant per-element bound, a strengthening since m <= N. Drafted statement follows the text (and jayyhk): largest prime factor <= (n : R)^eps.",
+    "Smoothness expressed as `forall p in (a+1+j).primeFactors, (p : R) <= (n : R)^eps` instead of the hosted custom `Nat.largestPrimeFactor` (not a Mathlib definition; jayyhk defines it ad hoc, sup of primeFactors). Equivalent: sup over primeFactors <= x iff every prime factor <= x, vacuous for m <= 1, and all elements here are >= 1.",
+    "Run parametrized ascending as {a+1, ..., a+k} with `n / 2 <= a + 1 && a + k <= n`, avoiding N truncated subtraction; both hosted use the descending form {a-(k-1), ..., a} with an extra guard `k <= a`. The substitution a_hosted = a_draft + k is a bijection between witnesses; the `k <= a` guard has no analogue needed in the ascending form.",
+    "'for all sufficiently large n' rendered as `forall-eventually n in atTop` (idiomatic Mathlib); both hosted use `exists N0, forall N, N0 <= N -> ...` (equivalent by definition of atTop eventually).",
+    "Window lower endpoint uses natural floor division n / 2, exactly as in both hosted theorems; the commentary writes '[n/2,n] (say)', so the endpoint convention is explicitly immaterial.",
+    "Statement form: FC house style `answer(True) <-> ...` with eps and k universally quantified inside the iff (the problem is a solved yes/no question); both hosted state the bare proposition with eps, k as theorem parameters (same content, different packaging)."
+  ]
 }

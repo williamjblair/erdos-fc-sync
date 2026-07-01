@@ -1,6 +1,6 @@
 {
   "problem": 315,
-  "status": "staged",
+  "status": "drafted",
   "staged_at": "2026-07-01T20:38:50+00:00",
   "upstream_state": "proved (Lean)",
   "latex_sha256": "91b05d17989ed3d796d43de90d7d52cea82257ce5d639af28210f29038e2fc37",
@@ -26,5 +26,15 @@
     "open_prs": [],
     "issues": []
   },
-  "divergence_notes": []
+  "divergence_notes": [
+    "FC house wrapper: stated as answer(True) ↔ ∀ a, … ; both hosted erdos_315 theorems are bare implications with the sequence a as a theorem parameter.",
+    "Monotonicity: the text says a₁<a₂<⋯, so we use StrictMono a — this matches jayyhk's erdos_315 (StrictMono) but DIVERGES from plby's erdos_315 (Monotone, a weaker hypothesis / stronger theorem). This is also a hosted-vs-hosted disagreement: plby Monotone vs jayyhk StrictMono.",
+    "Constant: the text defines c₀ = lim uₙ^{1/2ⁿ}, so we define c₀ := atTop.limUnder (fun i => (u i : ℝ) ^ ((1/2 : ℝ)^(i+1))) from the u-sequence itself. Both hosted instead define vardi_constant as the limUnder of the SHIFTED sequence: (sylvester i)^{(1/2)^(i+1)} with sylvester i = u i + 1. The two limits are equal (uₙ and uₙ+1 differ by 1 at doubly-exponential scale) but are NOT definitionally equal; we follow the text.",
+    "Recurrence: we define u by u 0 = 1, u (n+1) = u n * (u n + 1) per the text; both hosted define sylvester by s 0 = 2, s (i+1) = s i ^ 2 - s i + 1 (the shifted-by-1 Sylvester form the site notes is the same sequence). Our exclusion hypothesis ∃ i, a i ≠ u i + 1 is extensionally identical to hosted's ∃ i, a i ≠ sylvester i (sylvester i = u i + 1 by induction).",
+    "Indexing: a and u are 0-indexed (a i = a_{i+1}, u i = u_{i+1}), so the text's exponent 1/2ⁿ becomes (1/2 : ℝ)^(i+1) — same reindexing convention as both hosted proofs; the exponent is Real.rpow.",
+    "Hypotheses (∀ i, 0 < a i) and (∑' i, (1:ℝ)/a i = 1, a tsum over ℕ) are byte-identical in shape to both hosted erdos_315 theorems (hypothesis order differs: we place the exclusion before the sum).",
+    "The text's parenthetical claims (∑ 1/(uₖ+1) [=1], uₖ=⌊c₀^{2^k}+1⌋) are descriptive properties of u, not hypotheses of the question, and are not formalized — same choice as both hosted proofs."
+  ],
+  "ams_rationale": "11 = number theory (unit-fraction decompositions of 1, Sylvester's sequence, Erdős–Graham).",
+  "category": "research solved"
 }

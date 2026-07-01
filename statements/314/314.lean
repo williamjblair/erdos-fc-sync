@@ -21,19 +21,40 @@ import FormalConjectures.Util.ProblemImports
 
 *References:*
 - [erdosproblems.com/314](https://www.erdosproblems.com/314)
-<!-- DRAFTER: add cited papers from the solution line, [Xx00] style -->
+- [LiSt24] J. Lim and Steinerberger, S., *On differences of two harmonic numbers*.
+  arXiv:2405.11354 (2024).
 -/
+
+open Filter
 
 namespace Erdos314
 
+/-- The block harmonic sum $\sum_{n\leq k\leq m}\frac{1}{k}$. -/
+noncomputable def harmonicSum (n m : ℕ) : ℝ := ∑ k ∈ Finset.Icc n m, (1 : ℝ) / k
+
+/-- `mMin n` is the minimal `m` such that $\sum_{n\leq k\leq m}\frac{1}{k}\geq 1$; such an `m`
+exists for `n ≥ 1` since the harmonic series diverges. -/
+noncomputable def mMin (n : ℕ) : ℕ := sInf {m | 1 ≤ harmonicSum n m}
+
+/-- $\epsilon(n) = \sum_{n\leq k\leq m}\frac{1}{k}-1$, the overshoot of the minimal block sum
+reaching $1$. -/
+noncomputable def epsilon (n : ℕ) : ℝ := harmonicSum n (mMin n) - 1
+
 /--
-<!-- DRAFTER: the boxed problem text VERBATIM from inputs.md (do not rephrase);
-     for solved problems add the verbatim solution sentence + citations. -->
+Let $n\geq 1$ and let $m$ be minimal such that $\sum_{n\leq k\leq m}\frac{1}{k}\geq 1$. We define
+\[\epsilon(n) = \sum_{n\leq k\leq m}\frac{1}{k}-1.\]
+How small can $\epsilon(n)$ be? Is it true that
+\[\liminf n^2\epsilon(n)=0?\]
+
+This is true, and shown by Lim and Steinerberger [LiSt24], who further proved that, for any
+$\delta>0$, there exist infinitely many $n$ and $m$ such that
+\[n^2\left\lvert \sum_{n\leq k\leq m}\frac{1}{k}-1\right\rvert\ll \frac{1}{(\log n)^{5/4-\delta}}.\]
+Erdős and Graham (and also Lim and Steinerberger) believe that the exponent of $2$ is best
+possible here, in that $\liminf \epsilon(n) n^{2+\delta}=\infty$ for all $\delta>0$.
 -/
-@[category research solved, AMS 11]
-<!-- DRAFTER: fix AMS tags; add `formal_proof using lean4 at "<pinned-url>"`
-     ONLY if draft.json says link_allowed=true -->
-theorem erdos_314 : answer(sorry) := by
+@[category research solved, AMS 11 40]
+theorem erdos_314 : answer(True) ↔
+    atTop.liminf (fun n : ℕ => (n : ℝ) ^ 2 * epsilon n) = 0 := by
   sorry
 
 end Erdos314

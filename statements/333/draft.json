@@ -1,6 +1,6 @@
 {
   "problem": 333,
-  "status": "staged",
+  "status": "drafted",
   "staged_at": "2026-07-01T20:38:51+00:00",
   "upstream_state": "disproved (Lean)",
   "latex_sha256": "cfc91078f915163a6e065b02b646f2168ecf51b3fe5c9efb694b91d0fec29a66",
@@ -31,5 +31,14 @@
       }
     ]
   },
-  "divergence_notes": []
+  "divergence_notes": [
+    "Polarity/wrapper: stated as answer(False) ↔ P where P = (∀ A density-zero, ∃ B, A ⊆ B+B ∧ count = o(√N)) — FC house style for a disproved yes/no question (cf. FC 263.parts.ii). jayyhk's hosted erdos_333 is the direct negation ¬P; plby has NO erdos-named endpoint at all — its final main_obstruction is the conjunction (specific counterexample A has density zero) ∧ ¬∃ B …, which is strictly the witness form of ¬P. Hosted-vs-hosted: jayyhk wraps to ¬P, plby stops at the counterexample pair.",
+    "Density zero: we use FC's Set.HasDensity 0 (Tendsto of partialDensity = ncard over Set.Iio N divided by N); both hosted use Tendsto ((Finset.Icc 0 N).filter (· ∈ A)).card / N → 0. Iio N vs Icc 0 N counts differ by at most one element — the same natural-density-zero notion, not syntactically equal.",
+    "Counting range: the text says |B ∩ {1,…,N}|, so we count (Finset.Icc 1 N).filter (· ∈ B) (FC 32 house idiom); both hosted count over Finset.Icc 0 N (they include 0). Differs by ≤ 1, immaterial to o(√N); we follow the text.",
+    "Little-o: we formalize '= o(N^{1/2})' as Asymptotics.IsLittleO (=o[atTop] fun N => Real.sqrt N), the direct reading of the text and the FC idiom (cf. FC 32); both hosted use the equivalent Tendsto (count/√N) atTop (nhds 0). The text's 'for all large N' is absorbed into the atTop filter.",
+    "Sumset: A ⊆ B + B with Set pointwise addition (open scoped Pointwise); both hosted spell it out as A ⊆ {x | ∃ b b', b ∈ B ∧ b' ∈ B ∧ x = b + b'} — the same set (Set.mem_add is ∃ b ∈ B, ∃ b' ∈ B, b + b' = x; equation orientation flipped, propositionally equal).",
+    "B is an unconstrained Set ℕ (in particular not required to be a subset of A or infinite), matching both hosted and the text's bare 'a B'."
+  ],
+  "ams_rationale": "11 = number theory (additive bases: representing sets as B+B with thin B, Erdős–Newman).",
+  "category": "research solved"
 }

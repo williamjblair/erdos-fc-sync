@@ -1,6 +1,6 @@
 {
   "problem": 429,
-  "status": "staged",
+  "status": "drafted",
   "staged_at": "2026-07-01T20:38:55+00:00",
   "upstream_state": "disproved (Lean)",
   "latex_sha256": "fd61e89fbb71bff5be48f9ad4988ed4ac13cb4269836f50a5527209ce9f28324",
@@ -26,5 +26,15 @@
     "open_prs": [],
     "issues": []
   },
-  "divergence_notes": []
+  "category": "research solved",
+  "ams_rationale": "11 (number theory: primes in tuples / admissible sieve-type sets, 11N05, 11B25)",
+  "divergence_notes": [
+    "STATEMENT DIRECTION: the drafted theorem states the QUESTION positively as `answer(False) <-> P` (upstream state 'disproved (Lean)' maps to FC category 'research solved' with answer False). Both hosted theorems instead state the refuting construction directly: forall f -> infinity, exists infinite admissible B with counting function <= f and no prime translate. Modulo the notes below, the hosted statement is exactly the negation of the drafted proposition P.",
+    "'sparse enough' (informal in the text) formalized as: exists a threshold f : N -> N with Tendsto f atTop atTop such that every A with (A inter Icc 1 N).ncard <= f N for all N qualifies -- the same counting-function shape both hosted disproofs use. The Tendsto condition is load-bearing: without it, f = 0 would make the hypothesis class contain only subsets of {0} and the question degenerate.",
+    "A.Infinite added to the question's hypotheses; the text does not say 'infinite'. Rationale: a finite A would make the question an instance of the (open) prime k-tuples conjecture, which is not this problem, and both hosted theorems carry Infinite on the constructed counterexample. The proposition P is false either way (the same Weisenberg witness refutes the version quantified over all A), so this choice does not affect the answer(False) verdict.",
+    "Translate variable n quantified over N, following the text ('there exists some n' with A a subset of N). Both hosted disproofs prove the stronger negation with n over Z (`forall n : Z, exists b in B, not (b + n).toNat prime`), which implies the N case; the site commentary itself states the disproof 'for any n in Z'.",
+    "Admissibility inlined as `forall p prime, exists b : ZMod p, forall a in A, (a : ZMod p) != b` -- content-identical to the `Admissible` definition both hosted files share; no new definition introduced per FC guidance.",
+    "Counting via Set.ncard instead of the hosted `(B inter Set.Icc 1 N).toFinset.card` -- equal for these finite sets; ncard avoids Fintype instance plumbing and is the idiomatic Mathlib spelling.",
+    "Hosted primality is stated as `not Nat.Prime (Int.toNat (b + n))` because their n ranges over Z; the drafted question uses `(n + a).Prime` directly in N. No content difference on the N-restriction (b + n >= 0 there)."
+  ]
 }

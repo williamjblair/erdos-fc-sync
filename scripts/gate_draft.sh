@@ -34,7 +34,7 @@ for N in "$@"; do
 
   cp "$SRC" "$DST"
   build_ok=false; extract_ok=false; linkrule_ok=false
-  build_log=$(cd "$FC_DIR" && lake build "FormalConjectures.ErdosProblems.«$N»" 2>&1) \
+  build_log=$(cd "$FC_DIR" && lake build "FormalConjectures.ErdosProblems.«${N}»" 2>&1) \
     && build_ok=true
   if $build_ok; then
     extract_out=$(cd "$FC_DIR" && lake exe extract_names "FormalConjectures/ErdosProblems/$N.lean" --no-docstrings 2>/dev/null)

@@ -1,6 +1,6 @@
 {
   "problem": 164,
-  "status": "staged",
+  "status": "drafted",
   "staged_at": "2026-07-01T20:38:48+00:00",
   "upstream_state": "proved (Lean)",
   "latex_sha256": "8c6ba23ebc7a0b9c0f414533c486966d82e5b8c43bb5c91d1898a2052ffc12c5",
@@ -26,5 +26,15 @@
     "open_prs": [],
     "issues": []
   },
-  "divergence_notes": []
+  "divergence_notes": [
+    "Members > 1: both hosted bake (forall a in A, 2 <= a) into their PrimitiveSet predicate; draft keeps the problem text's definition verbatim (IsPrimitive A = no member of A divides another) and adds the floor as a separate hypothesis (forall a in A, 2 <= a), following the convention of Er35/Li23 ('a set of integers greater than one'). The floor is load-bearing for fidelity: without it, Lean's junk value 1 / (1 * Real.log 1) = 1 / 0 = 0 would make A = {1} satisfy the bound although the informal summand is undefined there, i.e. the naive statement would be Lean-true for the wrong reason.",
+    "Domain: Lean's Nat contains 0 while the problem's N starts at 1; the 2 <= a floor also excludes 0 (for which n * log n = 0 and the summand is again junk). Hosted handle this identically via the same floor inside PrimitiveSet.",
+    "Summand: draft inlines tsum over the subtype, sum' a : A, 1 / (a * Real.log a), matching the text's 1/(n log n); hosted factor this through erdosWeight n := 1 / (n * Real.log n) and primitiveWeightSum A := sum' a : A, erdosWeight a. Identical values. tsum agrees with the informal sum because Erdos [Er35] proves convergence for every primitive set (nonnegative terms).",
+    "Prime side: draft writes {p : Nat | p.Prime} inline; hosted name it primeSet := {p | p.Prime}. Identical.",
+    "Conjunct structure: draft asserts IsPrimitive {p | p.Prime} AND the maximisation inequality, following jayyhk's erdos_164 two-conjunct shape; plby's erdos164 carries an extra middle conjunct primitiveWeightSum primeSet = primeWeightSum, which is a definitional rfl about its own local abbreviation and adds no mathematical content. That extra conjunct is the only hosted-vs-hosted disagreement.",
+    "Form: draft wraps as answer(True) <-> (FC house style for solved yes/no questions); hosted are bare theorems.",
+    "Predicate naming: draft's local Erdos164.IsPrimitive (a ∈ A, b ∈ A, a | b -> a = b) is the Nat-specialisation of FC 1196's Erdos1196.IsPrimitive (which uses Associated over a CommMonoid); on Nat, Associated a b <-> a = b, so the notions coincide. Not reused directly because 1196's def lives in its own problem namespace."
+  ],
+  "ams_rationale": "AMS 11 (number theory): primitive sets under divisibility and sums over primes; matches FC 1196.",
+  "category": "research solved"
 }

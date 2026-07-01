@@ -21,19 +21,34 @@ import FormalConjectures.Util.ProblemImports
 
 *References:*
 - [erdosproblems.com/333](https://www.erdosproblems.com/333)
-<!-- DRAFTER: add cited papers from the solution line, [Xx00] style -->
+- [ErNe77] Erdős, P. and Newman, D. J., *Bases for sets of integers*. J. Number Theory (1977),
+  420-425.
 -/
+
+open Classical Filter Asymptotics
+
+open scoped Pointwise
 
 namespace Erdos333
 
 /--
-<!-- DRAFTER: the boxed problem text VERBATIM from inputs.md (do not rephrase);
-     for solved problems add the verbatim solution sentence + citations. -->
+Let $A\subseteq \mathbb{N}$ be a set of density zero. Does there exist a $B$ such that
+$A\subseteq B+B$ and
+\[\lvert B\cap \{1,\ldots,N\}\rvert =o(N^{1/2})\]
+for all large $N$?
+
+The answer is no. Erdős and Newman [ErNe77] have proved this is true when $A$ is the set of
+squares. In fact, Theorem 2 of [ErNe77] already implies a negative answer to this problem, but
+this seems to have been overlooked by Erdős and Graham.
+
+See also [806].
 -/
 @[category research solved, AMS 11]
-<!-- DRAFTER: fix AMS tags; add `formal_proof using lean4 at "<pinned-url>"`
-     ONLY if draft.json says link_allowed=true -->
-theorem erdos_333 : answer(sorry) := by
+theorem erdos_333 : answer(False) ↔
+    ∀ A : Set ℕ, A.HasDensity 0 →
+      ∃ B : Set ℕ, A ⊆ B + B ∧
+        (fun N => (((Finset.Icc 1 N).filter (· ∈ B)).card : ℝ)) =o[atTop]
+          fun N => Real.sqrt N := by
   sorry
 
 end Erdos333

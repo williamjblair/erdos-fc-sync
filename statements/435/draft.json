@@ -1,6 +1,6 @@
 {
   "problem": 435,
-  "status": "staged",
+  "status": "drafted",
   "staged_at": "2026-07-01T20:38:56+00:00",
   "upstream_state": "proved (Lean)",
   "latex_sha256": "14e3eee2a90f88dbce3c84c88577e8e2ca1988bbe33ddf667970da22d2c783f3",
@@ -26,5 +26,16 @@
     "open_prs": [],
     "issues": []
   },
-  "divergence_notes": []
+  "category": "research solved",
+  "ams_rationale": "5 11 (Frobenius problem for numerical semigroups, 11D07, with binomial-coefficient generators, 05A10)",
+  "divergence_notes": [
+    "'What is the largest integer not of the form ...' rendered as `IsGreatest {m : Z | not exists c, m = sum ...} target`; both hosted theorems state `target n not-in Representable n && forall x : Z, x > target n -> x in Representable n`. Logically equivalent: membership plus the contrapositive of the upper-bound half of IsGreatest. IsGreatest is the idiomatic Mathlib packaging.",
+    "Representability inlined: `exists c : N -> N, m = sum_{i in Finset.Ico 1 n} (c i : Z) * (n.choose i : Z)` (nonnegativity of the c_i encoded by the N codomain). Both hosted define `Representable n = AddSubmonoid.closure (Int.ofNat '' generators n)` with generators the binomials C(n,i), 1 <= i < n. Equivalent: the closure of a finite generator set is exactly the set of finite N-linear combinations. No new definition introduced per FC guidance.",
+    "`hn : n != 0` added beyond the literal text, exactly as in both hosted theorems: the source's n in N convention starts at 1, and n = 0 is not a prime power (so not excluded by n != p^k) yet has no largest non-representable integer (the form only yields 0). n = 1 is already excluded by the text's own k >= 0 clause (n != p^0).",
+    "The text's 'k >= 0' is captured by quantifying k over all of N in `forall p k : N, p.Prime -> n != p^k` -- byte-identical to the hosted hypothesis h_not_prime_pow.",
+    "Answer formula written with `n.primeFactors` as the index set; both hosted use `n.factorization.support`, which is equal (Nat.support_factorization). Exponents via `n.factorization p` in both. Same integer value: (sum over p | n of (sum_{1<=d<=a_p} C(n, p^d)) * (p - 1)) - n.",
+    "Ambient type Z for 'the largest integer', matching both hosted theorems; negative integers are never representable and the target is positive, so the greatest element over Z coincides with the classical Frobenius number over N.",
+    "plby and jayyhk final theorems are byte-identical (no hosted-vs-hosted disagreement on this problem).",
+    "'What is' question (not yes/no): stated as a bare proposition asserting the Hwang-Song value, per the drafting rules; no answer() wrapper."
+  ]
 }

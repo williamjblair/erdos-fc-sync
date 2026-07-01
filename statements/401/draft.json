@@ -1,6 +1,6 @@
 {
   "problem": 401,
-  "status": "staged",
+  "status": "drafted",
   "staged_at": "2026-07-01T20:38:54+00:00",
   "upstream_state": "proved (Lean)",
   "latex_sha256": "0a8c94afe2dbf162b1c1617d64f06b79ddf11fcbef857177a8e0fd7178658a27",
@@ -27,9 +27,19 @@
     "issues": [
       {
         "number": 712,
-        "title": "Erd\u0151s Problem 401"
+        "title": "Erdős Problem 401"
       }
     ]
   },
-  "divergence_notes": []
+  "category": "research solved",
+  "ams_rationale": "11 (number theory: factorial divisibility / primes, 11A41, 11B65)",
+  "divergence_notes": [
+    "HOSTED-vs-HOSTED structural disagreement: jayyhk's erdos_401 states the text's question directly (`exists f : N -> R, Tendsto f atTop atTop && forall r >= 1, ...`); plby has no single final statement matching the text -- its theorem_1 proves the property for one explicit witness omega(r) = (gamma/16)(p_{r+1}-1)/log p_{r+1} without the exists-f/Tendsto wrapper (the wrapper follows since omega -> infinity, which jayyhk proves separately). Drafted statement follows the text (and jayyhk's shape).",
+    "a1, a2 required positive (`0 < a1 && 0 < a2`) as in both hosted theorems; the text says only 'there exist a_1,a_2'. Positivity is the standard ErGr80 positive-integer convention and strengthens the statement (0! = 1 would otherwise admit degenerate witnesses such as a2 = 0).",
+    "r restricted to `1 <= r` as in both hosted theorems; the text presupposes p_r exists (the product 2^n 3^n ... p_r^n), so r >= 1 is implicit; for r = 0 the product would be empty.",
+    "2^n 3^n ... p_r^n formalized inline as `(prod i in Finset.range r, Nat.nth Nat.Prime i)^n`; both hosted define P r = prod_{j in range r} p(j+1) with p(j) = Nat.nth Nat.Prime (j-1) -- identical value (Nat.nth Nat.Prime 0 = 2, ..., Nat.nth Nat.Prime (r-1) = p_r). No new definition introduced.",
+    "f typed N -> R (matches jayyhk); the text does not specify a codomain, and f(r) multiplies log n, so real values are the natural reading. The inequality a1 + a2 > n + f(r) log n is stated in R with the standard casts, exactly as in both hosted theorems.",
+    "'for infinitely many n' rendered as Set.Infinite of the witness set, matching both hosted theorems.",
+    "Statement form: FC house style `answer(True) <-> ...` (solved yes/no question); jayyhk states the bare proposition, plby only the omega-instance."
+  ]
 }

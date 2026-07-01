@@ -21,19 +21,26 @@ import FormalConjectures.Util.ProblemImports
 
 *References:*
 - [erdosproblems.com/93](https://www.erdosproblems.com/93)
-<!-- DRAFTER: add cited papers from the solution line, [Xx00] style -->
+- [Al63] Altman, E., *On a problem of P. Erdős*. Amer. Math. Monthly (1963), 148-157.
 -/
+
+open EuclideanGeometry
 
 namespace Erdos93
 
 /--
-<!-- DRAFTER: the boxed problem text VERBATIM from inputs.md (do not rephrase);
-     for solved problems add the verbatim solution sentence + citations. -->
+If $n$ distinct points in $\mathbb{R}^2$ form a convex polygon then they determine at least
+$\lfloor \frac{n}{2}\rfloor$ distinct distances.
+
+Solved by Altman [Al63].
+
+We formalise the hypothesis as: $A$ is a finite set of at least three points in $\mathbb{R}^2$
+in convex position (`ConvexIndep`), i.e. $A$ is the vertex set of a convex polygon.
 -/
-@[category research solved, AMS 11]
-<!-- DRAFTER: fix AMS tags; add `formal_proof using lean4 at "<pinned-url>"`
-     ONLY if draft.json says link_allowed=true -->
-theorem erdos_93 : answer(sorry) := by
+@[category research solved, AMS 52]
+theorem erdos_93 (A : Finset ℝ²) (hA_card : 3 ≤ A.card)
+    (hA : ConvexIndep (A : Set ℝ²)) :
+    A.card / 2 ≤ distinctDistances A := by
   sorry
 
 end Erdos93

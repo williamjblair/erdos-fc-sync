@@ -1,6 +1,6 @@
 {
   "problem": 93,
-  "status": "staged",
+  "status": "drafted",
   "staged_at": "2026-07-01T20:38:46+00:00",
   "upstream_state": "proved (Lean)",
   "latex_sha256": "cb1ec62b5d4cbe2119d1fe67fa62426c7e7725635b63126e5791257eaacb75fb",
@@ -31,5 +31,14 @@
       }
     ]
   },
-  "divergence_notes": []
+  "divergence_notes": [
+    "Space: draft uses FC's concrete R^2 (EuclideanSpace R (Fin 2), the scoped notation from FormalConjecturesForMathlib/Geometry/2d.lean), house style of the sibling problems FC 982 and FC 1082; both hosted quantify over an abstract V with [NormedAddCommGroup V] [InnerProductSpace R V] [Fact (finrank R V = 2)]. Equivalent up to isometric isomorphism.",
+    "Convex position: draft uses FC's EuclideanGeometry.ConvexIndep (A : Set R^2) := forall a in A, a not in convexHull R (A \\ {a}); hosted use Mathlib's ConvexIndependent R (Subtype.val : s -> V). Equivalent by Mathlib's convexIndependent_set_iff_not_mem_convexHull_diff.",
+    "Distinct-distance count: draft uses FC's EuclideanGeometry.distinctDistances (card of the image of dist over A.offDiag, a Nat); hosted build a Finset R of distances via (s.product s).filter (ne) |>.image dist and take .card at the theorem site. Same number.",
+    "Parametrisation: hosted carry (n : Nat) with h_card : s.card = n and conclude (distinctDistances s).card >= n / 2; draft states A.card / 2 <= distinctDistances A directly. Nat floor division renders the floor(n/2) in both; >= vs <= is orientation only. Same content, and byte-parallel to FC 1082.parts.i (Szemeredi's variant of this problem).",
+    "Cardinality floor: both hosted assume 3 <= n; draft keeps 3 <= A.card, reading 'form a convex polygon' as requiring at least three vertices. For <= 2 points the inequality is trivially true, so retaining the floor does not materially weaken the claim.",
+    "Hosted-vs-hosted: plby altman_erdos and jayyhk erdos_93 are identical statements modulo theorem name and a noncomputable marker on distinctDistances. No disagreement."
+  ],
+  "ams_rationale": "AMS 52 (convex and discrete geometry): distinct distances among vertices of a convex polygon; matches FC 89/91/982.",
+  "category": "research solved"
 }

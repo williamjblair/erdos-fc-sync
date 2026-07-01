@@ -1,6 +1,6 @@
 {
   "problem": 314,
-  "status": "staged",
+  "status": "drafted",
   "staged_at": "2026-07-01T20:38:49+00:00",
   "upstream_state": "proved (Lean)",
   "latex_sha256": "5cf8b224a7d3ae31d4bf2086c6a58ddb60ee7adce081b83483e6f9a6d82c8f0c",
@@ -26,5 +26,14 @@
     "open_prs": [],
     "issues": []
   },
-  "divergence_notes": []
+  "divergence_notes": [
+    "FC house wrapper: stated as answer(True) ↔ (liminf n²·ε(n) = 0); jayyhk's hosted erdos_314 is the bare equality Filter.liminf (fun n => (n:ℝ)^2 * eps n) atTop = 0 with no answer() wrapper.",
+    "vs plby: plby has NO erdos_314 endpoint; its final theorem is main_theorem : ∀ c > 0, ∀ N, ∃ m n, N ≤ n ∧ 1 ≤ ∑_{n≤k≤m} 1/k ≤ 1 + c/n² — a block-existence form that never defines ε(n) via the minimal m. Our statement follows the problem text's liminf-of-ε(n) formulation (plby's form implies it via minimality of mMin, as jayyhk's derivation shows).",
+    "vs jayyhk: definitions harmonicSum/mMin/epsilon match jayyhk's harmonicPartialSum/mMin/eps modulo naming; one normalization difference: we write the summand (1 : ℝ) / k (FC 290 house style) where both hosted use (↑k)⁻¹ (definitionally one_div apart).",
+    "Domain: n ranges over all of ℕ in the liminf (n = 0 included, where the k = 0 summand (1:ℝ)/0 = 0, so mMin 0 = 1 and ε(0) = 0); the text's n ≥ 1 restriction is immaterial to liminf at atTop. Same convention as both hosted proofs.",
+    "The text's first question, 'How small can ε(n) be?', is an open-ended estimation prompt and is not separately formalized — same scoping choice as both hosted proofs, which formalize only the yes/no liminf question.",
+    "sInf on ℕ returns 0 for the empty set, but {m | 1 ≤ harmonicSum n m} is nonempty for every n (harmonic divergence; and trivially m = 1 works for n ≤ 1), so mMin is the true minimal m — same well-definedness argument as jayyhk's Nat.sInf_mem usage."
+  ],
+  "ams_rationale": "11 = number theory (Erdős–Graham harmonic-block problem), 40 = sequences/series/summability (liminf of the harmonic overshoot sequence).",
+  "category": "research solved"
 }
