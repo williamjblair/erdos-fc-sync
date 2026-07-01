@@ -21,7 +21,6 @@
   "discrepancies": [
     258,
     281,
-    347,
     659,
     694,
     997,
@@ -12386,7 +12385,7 @@
       "bucket": "done",
       "candidate_claims": null,
       "claims": [],
-      "discrepancy": true,
+      "discrepancy": false,
       "erdos_state": "proved (Lean)",
       "erdos_url": "https://www.erdosproblems.com/347",
       "fc": {
@@ -12402,12 +12401,10 @@
       "held_for_review": false,
       "latex_url": "https://www.erdosproblems.com/latex/347",
       "machine": {
-        "named_assumptions": [
-          "h : Erdos347.is_cofinite_subsequence S"
-        ],
+        "named_assumptions": [],
         "non_kernel_axioms": [],
         "source": "plby",
-        "verdict": "conditional"
+        "verdict": "unconditional"
       },
       "override": null,
       "problem": 347,

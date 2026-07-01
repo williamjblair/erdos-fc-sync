@@ -961,15 +961,14 @@
     "erdos_url": "https://www.erdosproblems.com/347",
     "fc_status": "proved (Lean)",
     "fc_bucket": "done",
-    "headline_decl": "Erdos347.main_theorem",
-    "machine_verdict": "conditional",
+    "headline_decl": "Erdos347.answer_is_yes",
+    "machine_verdict": "unconditional",
     "axiom_verdict": "kernel_clean",
     "non_kernel_axioms": [],
-    "named_assumptions": [
-      "h : Erdos347.is_cofinite_subsequence S"
-    ],
+    "named_assumptions": [],
     "preconditions": [],
     "all_decls": {
+      "Erdos347.answer_is_yes": "unconditional",
       "Erdos347.main_theorem": "conditional"
     }
   },

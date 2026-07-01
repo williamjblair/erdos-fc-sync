@@ -35,14 +35,22 @@ STATUS = SP.parent / "site" / "status.json"
 # name; `keep` selects the headline theorem(s) in each file.
 # `headline_override` pins the boxed theorem for a problem the name heuristic
 # mis-selects. Hand-verified, one entry per correction, kept explicit so the choice
-# is auditable rather than emergent. #997's file names its boxed result `erdos997`
-# (no underscore, so the `erdos_` keep-prefix misses it) at the end of the file, past
-# the `thms[:2]` fallback window, so the heuristic picked the helper
-# `not_wellDistributed_of_clustering`, which is conditional on a `HasClustering`
-# hypothesis the boxed theorem discharges. The boxed theorem's own
-# `#print axioms erdos997` attests the real dependency: the visible `maynardTaoBFT`
-# axiom. Pinning it keeps the verdict (still conditional, still a discrepancy) but
+# is auditable rather than emergent.
+#
+# #997: the file names its boxed result `erdos997` (no underscore, so the `erdos_`
+# keep-prefix misses it) at the end of the file, past the `thms[:2]` fallback window,
+# so the heuristic picked the helper `not_wellDistributed_of_clustering`, which is
+# conditional on a `HasClustering` hypothesis the boxed theorem discharges. The boxed
+# theorem's own `#print axioms erdos997` attests the real dependency: the visible
+# `maynardTaoBFT` axiom. Verdict stays conditional (still a discrepancy) but now
 # reports a visible axiom instead of an invisible hypothesis.
+#
+# #347: the heuristic picked the helper `main_theorem`, which is conditional on an
+# `is_cofinite_subsequence` hypothesis. The file's actual boxed answer is
+# `answer_is_yes` (it constructs the sequence, discharges the hypothesis, and
+# `#print axioms answer_is_yes` is kernel-clean). Pinning it flips 347 to
+# unconditional: it was a FALSE positive in the discrepancy view, not a conditional
+# proof. The keep-prefix missed `answer_is_yes` (no `erdos_`/`main_theorem` prefix).
 REPOS = {
     "plby": {
         "root_env": "VELA_PROOF_REPO",
@@ -50,7 +58,7 @@ REPOS = {
         "glob": "ErdosProblems/Erdos[0-9]*.lean",
         "num_re": r"Erdos(\d+)",
         "keep": ("erdos_", "main_theorem", "not_erdos"),
-        "headline_override": {997: "erdos997"},
+        "headline_override": {997: "erdos997", 347: "answer_is_yes"},
     },
     "alphaproof": {
         "root_env": "VELA_PROOF_REPO_ALPHAPROOF",

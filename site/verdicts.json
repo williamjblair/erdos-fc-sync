@@ -11824,7 +11824,7 @@
     },
     {
       "bucket": "done",
-      "discrepancy": true,
+      "discrepancy": false,
       "erdos_state": "proved (Lean)",
       "erdos_url": "https://www.erdosproblems.com/347",
       "fc_has_proof": true,
@@ -11836,10 +11836,8 @@
       "gpt_erdos": null,
       "held_for_review": false,
       "machine_source": "plby",
-      "machine_verdict": "conditional",
-      "named_assumptions": [
-        "h : Erdos347.is_cofinite_subsequence S"
-      ],
+      "machine_verdict": "unconditional",
+      "named_assumptions": [],
       "non_kernel_axioms": [],
       "problem": 347,
       "proof_link": "https://github.com/ebarschkis/ErdosProblem/blob/main/Problem347/Formalization.lean",
@@ -41609,7 +41607,6 @@
       224,
       281,
       296,
-      347,
       350,
       785,
       964,
@@ -41654,7 +41651,6 @@
     "discrepancies": [
       258,
       281,
-      347,
       659,
       694,
       997,
@@ -41664,7 +41660,7 @@
     ],
     "gpt_erdos_problems": 57,
     "held_for_review": [],
-    "machine_conditional": 26,
+    "machine_conditional": 25,
     "problems": 1217,
     "signed_fidelity": [
       {
