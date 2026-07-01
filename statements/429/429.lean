@@ -45,7 +45,8 @@ $f:\mathbb{N}\to\mathbb{N}$ with $f(N)\to\infty$ such that every infinite $A$ wi
 $\lvert A\cap[1,N]\rvert\leq f(N)$ for all $N$, missing a residue class modulo every prime,
 admits such an $n$? Weisenberg's constructions refute this for every choice of $f$.
 -/
-@[category research solved, AMS 11]
+@[category research solved, AMS 11,
+  formal_proof using lean4 at "https://github.com/plby/lean-proofs/blob/1d7b3f00780b85ed0462e79a1cd5650ee9055655/src/v4.29.1/ErdosProblems/Erdos429.lean"]
 theorem erdos_429 : answer(False) ↔
     ∃ f : ℕ → ℕ, Tendsto f atTop atTop ∧
       ∀ A : Set ℕ, A.Infinite → (∀ N, (A ∩ Set.Icc 1 N).ncard ≤ f N) →

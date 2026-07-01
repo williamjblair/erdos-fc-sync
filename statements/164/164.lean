@@ -47,7 +47,8 @@ Price, Shah, Tang, and Tao [ABLLPSTT26].
 Following the convention of [Li23] we require the members of a primitive set to be greater than
 one; this excludes $A = \{1\}$, for which the summand $\frac{1}{1\cdot\log 1}$ is not defined.
 -/
-@[category research solved, AMS 11]
+@[category research solved, AMS 11,
+  formal_proof using lean4 at "https://github.com/plby/lean-proofs/blob/1d7b3f00780b85ed0462e79a1cd5650ee9055655/src/v4.29.1/ErdosProblems/Erdos164.lean"]
 theorem erdos_164 : answer(True) ↔
     IsPrimitive {p : ℕ | p.Prime} ∧
       ∀ A : Set ℕ, (∀ a ∈ A, 2 ≤ a) → IsPrimitive A →
