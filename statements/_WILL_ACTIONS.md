@@ -23,20 +23,13 @@ Comment on https://github.com/google-deepmind/formal-conjectures/issues/3998:
 > 401, 429, 435 (same conventions as #4319/#4343/#4345). Will open the PR once
 > they're reviewed on my side.
 
-## 3. The batch-3 fidelity session (packets are ready)
+## 3. The batch-3 session — one command
 
-1. Read `packets/draft-review/erdos_<n>.md` for each of the ten (the draft is
-   inlined; judge it against the verbatim problem text). Review-critical:
-   369 (formalizes the non-trivial variant — the literal text is trivially
-   true), 164 (the `2 ≤ a` floor), 315 (follows the text over a plby/jayyhk
-   disagreement), 435 (bare IsGreatest proposition).
-2. Fill each `"verdict"` in `packets/draft-review/verdicts_stub.json`
-   (faithful / variant / unfaithful — leave nothing empty; targets are
-   filled for you).
-3. One command signs everything (creates the findings, fills targets, one
-   key read, re-materializes):
-   `bash scripts/sign-batch.sh`
-4. Commit the signed state, then assemble:
-   `git add .vela/ frontier.json frontier.yaml vela.lock proof/ && git commit -m 'Sign batch-3 fidelity verdicts' && git push`
-   `python scripts/submit_batch.py assemble batch-3`
-   …and run its three printed commands (commit, push, `gh pr create`).
+```bash
+bash scripts/ship.sh
+```
+
+It shows the ten-line digest (the key divergence per problem), asks once —
+sign **[a]ll** as faithful, **[r]eview** each packet inline, or **[q]uit** —
+then signs under your key, commits the signed state, assembles the FC branch,
+and (after one y/N) pushes and opens the PR. Two keystrokes, both yours.
