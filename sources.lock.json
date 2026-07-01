@@ -1,10 +1,8 @@
 {
-  "generated_at": "2026-07-01T18:38:32+00:00",
+  "generated_at": "2026-07-01T18:49:21+00:00",
   "sources": {
     "erdos": {
-      "commit": "cbf955c5bd8e512114b5d4ae7905e9a6fc84f880",
       "kind": "problem_registry",
-      "ref": "main",
       "repo": "teorth/erdosproblems",
       "sha256": "sha256:3921f4f732fa51b8ad3597ea5ef50cade1006db44ce89c8dc61012cc9ca61945",
       "url": "https://raw.githubusercontent.com/teorth/erdosproblems/main/data/problems.yaml"
@@ -12,7 +10,7 @@
     "fidelity": {
       "home": "self (.vela/ -> frontier.json)",
       "kind": "statement_attestations",
-      "sha256": "sha256:46ab042a5998a723a4352d9028bc56d0e2d24cd52b66a40f08f61f47d8d0b65e"
+      "sha256": "sha256:36d02b124da377abc0df291e611f28d9af885df60238814e9d378a4b32280453"
     },
     "formal_conjectures": {
       "kind": "formal_statement_registry",
@@ -27,17 +25,13 @@
       "sha256": "sha256:c0f626a4792d6b150b79268807ea2f9316f2b09be5475fb6ee1b14f630bc1136"
     },
     "jayyhk": {
-      "commit": "b12d53bd274d885babf694ef3fef0b5f199095cc",
       "kind": "proof_manifest",
-      "ref": "main",
       "repo": "Jayyhk/erdos-lean",
       "sha256": "sha256:e2db2d0f227523d6c1c9f257e5c89baf3e9591d47ebed54c7b9e6c7843df8610",
       "url": "https://raw.githubusercontent.com/Jayyhk/erdos-lean/main/data/problems.yaml"
     },
     "plby": {
-      "commit": "1d7b3f00780b85ed0462e79a1cd5650ee9055655",
       "kind": "proof_manifest",
-      "ref": "main",
       "repo": "plby/lean-proofs",
       "sha256": "sha256:56caee303150d0c3b320a8ba3fe6444e345ac5bed2f0b6728cf8bd279bf13507",
       "url": "https://raw.githubusercontent.com/plby/lean-proofs/main/data/sources.yaml"
@@ -49,9 +43,7 @@
       "sha256": "sha256:65f7f510a2f2edaafbb73b6a26e365394228bc48b18d3c54e2dee5c01b7bb092"
     },
     "williamjblair_lean_proofs": {
-      "commit": "800493c37d67364c8454d21c3d6adbf4e36c86aa",
       "kind": "proof_manifest",
-      "ref": "main",
       "repo": "williamjblair/lean-proofs",
       "sha256": "sha256:b0e681bf49f2282f410a7e4c46047ff2241a879f7bfd03c816387f2ca58bc9df",
       "url": "https://raw.githubusercontent.com/williamjblair/lean-proofs/main/proofs.yaml"

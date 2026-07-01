@@ -8681,8 +8681,8 @@
       "fc_linked": true,
       "fc_theorem": "Erdos258.erdos_258",
       "fc_url": "https://google-deepmind.github.io/formal-conjectures/theorem/?name=Erdos258.erdos_258",
-      "fidelity_note": null,
-      "fidelity_source": null,
+      "fidelity_note": "FC's erdos_258 quantifies over all a_n \u2192 \u221e and asserts the divisor series is irrational, matching the boxed problem.",
+      "fidelity_source": "local",
       "gpt_erdos": null,
       "held_for_review": false,
       "machine_source": "plby",
@@ -8714,8 +8714,8 @@
         }
       ],
       "recommended_action": "No action.",
-      "signed_by": null,
-      "signed_fidelity_verdict": null,
+      "signed_by": "reviewer:will-blair",
+      "signed_fidelity_verdict": "faithful",
       "wiki_ai_systems": [
         "Aristotle",
         "GPT-5.4 Pro"
@@ -41923,6 +41923,11 @@
         "problem": 214,
         "reviewer": "reviewer:will-blair",
         "verdict": "unfaithful"
+      },
+      {
+        "problem": 258,
+        "reviewer": "reviewer:will-blair",
+        "verdict": "faithful"
       },
       {
         "problem": 337,

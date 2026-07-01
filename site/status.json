@@ -9029,7 +9029,15 @@
         "path": "FormalConjectures/ErdosProblems/258.lean",
         "theorem": "Erdos258.erdos_258"
       },
-      "fidelity": null,
+      "fidelity": {
+        "formal_ref": "google-deepmind/formal-conjectures@HEAD:FormalConjectures/ErdosProblems/258.lean",
+        "note": "FC's erdos_258 quantifies over all a_n \u2192 \u221e and asserts the divisor series is irrational, matching the boxed problem.",
+        "reviewer": "reviewer:will-blair",
+        "signed": true,
+        "source": "local",
+        "stale": null,
+        "verdict": "faithful"
+      },
       "held_for_review": false,
       "latex_url": "https://www.erdosproblems.com/latex/258",
       "machine": {

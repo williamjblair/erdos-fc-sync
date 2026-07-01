@@ -112,7 +112,7 @@ _none_
 
 _none_
 
-## statement fidelity — 4 signed verdict(s)
+## statement fidelity — 5 signed verdict(s)
 
 Signed statement-fidelity verdicts: a reviewer attests whether the formal theorem faithfully states the boxed problem. A signed verdict supersedes the computed bucket and any matching `overrides.yaml` row.
 
@@ -120,5 +120,6 @@ Signed statement-fidelity verdicts: a reviewer attests whether the formal theore
 |---|---|---|---|---|
 | [205](https://www.erdosproblems.com/205) | `variant` | local | reviewer:will-blair | [theorem](https://www.erdosproblems.com/205) |
 | [214](https://www.erdosproblems.com/214) | `unfaithful` | local | reviewer:will-blair | [theorem](https://www.erdosproblems.com/214) |
+| [258](https://www.erdosproblems.com/258) | `faithful` | local | reviewer:will-blair | [theorem](https://google-deepmind.github.io/formal-conjectures/theorem/?name=Erdos258.erdos_258) |
 | [337](https://www.erdosproblems.com/337) | `unfaithful` | local | reviewer:will-blair | [theorem](https://www.erdosproblems.com/337) |
 | [1148](https://www.erdosproblems.com/1148) | `variant` | local | reviewer:will-blair | [theorem](https://google-deepmind.github.io/formal-conjectures/theorem/?name=Erdos1148.erdos_1148) |
