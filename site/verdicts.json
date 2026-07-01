@@ -6868,8 +6868,8 @@
       "fc_linked": false,
       "fc_theorem": null,
       "fc_url": null,
-      "fidelity_note": null,
-      "fidelity_source": "hub",
+      "fidelity_note": "Treat as conditional until the hosted theorem is confirmed to have no non-problem hypothesis.",
+      "fidelity_source": "local",
       "gpt_erdos": null,
       "held_for_review": false,
       "machine_source": "plby",
@@ -6899,7 +6899,7 @@
         }
       ],
       "recommended_action": "Do not add a formal_proof link; document or wait for an unconditional theorem.",
-      "signed_by": null,
+      "signed_by": "reviewer:will-blair",
       "signed_fidelity_verdict": "variant",
       "wiki_ai_systems": [
         "Aristotle",
@@ -7193,8 +7193,8 @@
       "fc_linked": false,
       "fc_theorem": null,
       "fc_url": null,
-      "fidelity_note": null,
-      "fidelity_source": "hub",
+      "fidelity_note": "Hosted proof is complete, but proves an existential coloring result rather than the universal boxed problem.",
+      "fidelity_source": "local",
       "gpt_erdos": null,
       "held_for_review": false,
       "machine_source": "plby",
@@ -7224,7 +7224,7 @@
         }
       ],
       "recommended_action": "Skip until a hosted proof matches the boxed FC statement.",
-      "signed_by": null,
+      "signed_by": "reviewer:will-blair",
       "signed_fidelity_verdict": "unfaithful",
       "wiki_ai_systems": [
         "Aristotle"
@@ -11494,8 +11494,8 @@
       "fc_linked": false,
       "fc_theorem": null,
       "fc_url": null,
-      "fidelity_note": null,
-      "fidelity_source": "hub",
+      "fidelity_note": "Hosted proof is a counterexample/existence theorem and needs a fresh match-check before linking to the FC statement.",
+      "fidelity_source": "local",
       "gpt_erdos": null,
       "held_for_review": false,
       "machine_source": "plby",
@@ -11525,7 +11525,7 @@
         }
       ],
       "recommended_action": "Skip until a hosted proof matches the boxed FC statement.",
-      "signed_by": null,
+      "signed_by": "reviewer:will-blair",
       "signed_fidelity_verdict": "unfaithful",
       "wiki_ai_systems": [
         "Aristotle"
@@ -39296,8 +39296,8 @@
       "fc_linked": false,
       "fc_theorem": "Erdos1148.erdos_1148",
       "fc_url": "https://google-deepmind.github.io/formal-conjectures/theorem/?name=Erdos1148.erdos_1148",
-      "fidelity_note": null,
-      "fidelity_source": "hub",
+      "fidelity_note": "Hosted theorem takes Duke's theorem as a hypothesis; #print axioms alone would not catch this.",
+      "fidelity_source": "local",
       "gpt_erdos": null,
       "held_for_review": false,
       "machine_source": "plby",
@@ -39329,7 +39329,7 @@
         }
       ],
       "recommended_action": "Do not add a formal_proof link; document or wait for an unconditional theorem.",
-      "signed_by": null,
+      "signed_by": "reviewer:will-blair",
       "signed_fidelity_verdict": "variant",
       "wiki_ai_systems": [
         "Claude Opus 4.6",
@@ -41944,22 +41944,22 @@
     "signed_fidelity": [
       {
         "problem": 205,
-        "reviewer": null,
+        "reviewer": "reviewer:will-blair",
         "verdict": "variant"
       },
       {
         "problem": 214,
-        "reviewer": null,
+        "reviewer": "reviewer:will-blair",
         "verdict": "unfaithful"
       },
       {
         "problem": 337,
-        "reviewer": null,
+        "reviewer": "reviewer:will-blair",
         "verdict": "unfaithful"
       },
       {
         "problem": 1148,
-        "reviewer": null,
+        "reviewer": "reviewer:will-blair",
         "verdict": "variant"
       }
     ],

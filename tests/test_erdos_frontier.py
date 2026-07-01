@@ -229,6 +229,8 @@ def test_fidelity_verdict_flows_to_mismatch_bucket_and_row_field():
     assert row["fidelity"] == {
         "verdict": "unfaithful",
         "reviewer": "reviewer:will-blair",
+        "signed": True,
+        "note": "proves an existential coloring result, not the universal boxed problem",
         "formal_ref": "google-deepmind/formal-conjectures@HEAD:ErdosProblems/214.lean",
         "source": "hub",
         "stale": None,

@@ -7125,8 +7125,10 @@
       },
       "fidelity": {
         "formal_ref": "google-deepmind/formal-conjectures@HEAD:FormalConjectures/ErdosProblems/205.lean",
+        "note": "Treat as conditional until the hosted theorem is confirmed to have no non-problem hypothesis.",
         "reviewer": "reviewer:will-blair",
-        "source": "hub",
+        "signed": true,
+        "source": "local",
         "stale": null,
         "verdict": "variant"
       },
@@ -7475,8 +7477,10 @@
       },
       "fidelity": {
         "formal_ref": "google-deepmind/formal-conjectures@HEAD:FormalConjectures/ErdosProblems/214.lean",
+        "note": "Hosted proof is complete, but proves an existential coloring result rather than the universal boxed problem.",
         "reviewer": "reviewer:will-blair",
-        "source": "hub",
+        "signed": true,
+        "source": "local",
         "stale": null,
         "verdict": "unfaithful"
       },
@@ -12036,8 +12040,10 @@
       },
       "fidelity": {
         "formal_ref": "google-deepmind/formal-conjectures@HEAD:FormalConjectures/ErdosProblems/337.lean",
+        "note": "Hosted proof is a counterexample/existence theorem and needs a fresh match-check before linking to the FC statement.",
         "reviewer": "reviewer:will-blair",
-        "source": "hub",
+        "signed": true,
+        "source": "local",
         "stale": null,
         "verdict": "unfaithful"
       },
@@ -41442,8 +41448,10 @@
       },
       "fidelity": {
         "formal_ref": "google-deepmind/formal-conjectures@HEAD:FormalConjectures/ErdosProblems/1148.lean",
+        "note": "Hosted theorem takes Duke's theorem as a hypothesis; #print axioms alone would not catch this.",
         "reviewer": "reviewer:will-blair",
-        "source": "hub",
+        "signed": true,
+        "source": "local",
         "stale": null,
         "verdict": "variant"
       },

@@ -494,14 +494,27 @@ def parse_fidelity(doc: dict | None, *, source: str) -> dict[int, dict]:
     return out
 
 
+LOCAL_FRONTIER = Path(__file__).resolve().parent / "frontier.json"
+
+
 def load_fidelity(url_or_path: str | Path = FIDELITY_URL) -> dict[int, dict]:
     """Load signed statement-fidelity verdicts keyed by problem number.
 
-    Primary read is the hub URL; on any network failure (matching the
-    ``vlp_doc`` fallback pattern) fall back to the committed
-    ``fidelity_cache.json``. If that is missing too, return ``{}`` so the
+    Primary read is the repo's own replayed ``frontier.json`` — the git-native
+    source of truth this repo now hosts, the same state ``vela check`` verifies.
+    If that is absent (a partial checkout), fall back to the hub snapshot, then to
+    the committed ``fidelity_cache.json``. If all are missing, return ``{}`` so the
     column is simply empty and the run still succeeds.
     """
+    # Prefer the local replayed frontier only for the default read; an explicit
+    # path or URL (offline runs, tests) is honored exactly as given.
+    if url_or_path == FIDELITY_URL and LOCAL_FRONTIER.exists():
+        try:
+            local = parse_fidelity(json.loads(LOCAL_FRONTIER.read_text()), source="local")
+            if local:
+                return local
+        except (OSError, json.JSONDecodeError):
+            pass
     target = str(url_or_path)
     if re.match(r"^https?://", target):
         try:
@@ -731,6 +744,8 @@ def fidelity_field(fidelity: dict | None, fc_data: dict) -> dict | None:
     return {
         "verdict": fidelity.get("verdict"),
         "reviewer": fidelity.get("reviewer"),
+        "signed": fidelity.get("signed"),
+        "note": fidelity.get("note"),
         "formal_ref": fidelity.get("formal_ref"),
         "source": fidelity.get("source"),
         "stale": stale,

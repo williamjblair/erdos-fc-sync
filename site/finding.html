@@ -113,8 +113,8 @@ function render(r, conds){
   const proof = proofCell(r), stmt = stmtCell(r);
   const fcLink = r.fc_url ? `<a href="${esc(r.fc_url)}">Formal Conjectures</a>` : "";
   const src = r.machine_source ? `audited from <code>${esc(r.machine_source)}</code>` : "no machine source";
-  const fidsrc = r.signed_fidelity_verdict
-    ? ` · fidelity from ${r.fidelity_source==="hub" ? "the live hub" : "an offline snapshot"}` : "";
+  const srcLabel = {local:"the repo's signed frontier", hub:"the live hub", cache:"an offline snapshot"}[r.fidelity_source] || "an offline snapshot";
+  const fidsrc = r.signed_fidelity_verdict ? ` · fidelity from ${srcLabel}` : "";
   const reproCmd = r.machine_source
     ? `# clone the proof repo, then, in its built .lake:\npython lean/extract_assumptions.py --repo ${esc(r.machine_source)}\n# the boxed theorem's own #print axioms is the ground truth`
     : "No machine-audited proof to reproduce.";

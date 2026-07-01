@@ -120,7 +120,7 @@ Signed statement-fidelity verdicts: a reviewer attests whether the formal theore
 
 | problem | verdict | source | reviewer | theorem |
 |---|---|---|---|---|
-| [205](https://www.erdosproblems.com/205) | `variant` | hub | reviewer:will-blair | [theorem](https://www.erdosproblems.com/205) |
-| [214](https://www.erdosproblems.com/214) | `unfaithful` | hub | reviewer:will-blair | [theorem](https://www.erdosproblems.com/214) |
-| [337](https://www.erdosproblems.com/337) | `unfaithful` | hub | reviewer:will-blair | [theorem](https://www.erdosproblems.com/337) |
-| [1148](https://www.erdosproblems.com/1148) | `variant` | hub | reviewer:will-blair | [theorem](https://google-deepmind.github.io/formal-conjectures/theorem/?name=Erdos1148.erdos_1148) |
+| [205](https://www.erdosproblems.com/205) | `variant` | local | reviewer:will-blair | [theorem](https://www.erdosproblems.com/205) |
+| [214](https://www.erdosproblems.com/214) | `unfaithful` | local | reviewer:will-blair | [theorem](https://www.erdosproblems.com/214) |
+| [337](https://www.erdosproblems.com/337) | `unfaithful` | local | reviewer:will-blair | [theorem](https://www.erdosproblems.com/337) |
+| [1148](https://www.erdosproblems.com/1148) | `variant` | local | reviewer:will-blair | [theorem](https://google-deepmind.github.io/formal-conjectures/theorem/?name=Erdos1148.erdos_1148) |
