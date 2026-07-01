@@ -1,8 +1,17 @@
 {
+  "_generated_by": "vela agents sync (from VELA.md) — edit VELA.md, not this file",
   "mcpServers": {
-    "erdos-frontier": {
+    "vela-local": {
+      "args": [
+        "serve",
+        ".",
+        "--profile",
+        "read-only"
+      ],
       "command": "vela",
-      "args": ["serve", ".", "--profile", "read-only"]
+      "env": {
+        "VELA_WORKTREE": "."
+      }
     }
   }
 }

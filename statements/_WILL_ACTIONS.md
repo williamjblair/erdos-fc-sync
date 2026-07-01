@@ -1,35 +1,37 @@
-# Will's queue — campaign actions only you can take
+# Will's queue
 
-## 1. Unblock #4345 (batch-2b: 31, 34, 47, 280) — 2 minutes
+The campaign state now lives in the frontier itself — no scripts, just vela.
+The 10 batch-3 drafts are pending proposals in your inbox (created by
+agent:claude, keyless; the engine refuses agents at every decision verb).
 
-Smetalo asked "Does this resolve #469?" and it's sitting unanswered, which may
-be why the PR has no review yet. #469 is an open request for problem 280, and
-the PR adds `280.lean`.
-
-Reply on https://github.com/google-deepmind/formal-conjectures/pull/4345:
-
-> Yes — this adds `FormalConjectures/ErdosProblems/280.lean`, which is what
-> #469 asks for. I've added "Closes #469" to the PR description so it links.
-
-Then edit the PR body and append:
-
-> Closes #469
-
-## 2. Claim batch-3 on the umbrella issue — 1 minute
-
-Comment on https://github.com/google-deepmind/formal-conjectures/issues/3998:
-
-> Working on statements for Erdős problems 24, 93, 164, 314, 315, 333, 369,
-> 401, 429, 435 (same conventions as #4319/#4343/#4345). Will open the PR once
-> they're reviewed on my side.
-
-## 3. The batch-3 session — one command
+## The batch-3 session (pure vela, from this repo)
 
 ```bash
-bash scripts/ship.sh
+vela inbox .                          # the 10 pending statement proposals
+vela diff <vpr_id>                    # inspect any one (drafts inline at
+                                      #   statements/<n>/<n>.lean; divergence
+                                      #   notes ride in each proposal)
+
+vela accept-batch . --all-pending --reason "batch-3 statements reviewed" --dry-run
+vela accept-batch . --all-pending --reason "batch-3 statements reviewed"
+
+# fidelity verdicts: fill each "verdict" (faithful/variant/unfaithful) in
+#   packets/draft-review/attest-batch3.json   (targets + hashes pre-filled)
+# — or just tell Claude your verdicts and it fills the file — then:
+vela attest . --batch packets/draft-review/attest-batch3.json --as reviewer:will-blair
+
+git add -A && git commit -m "Accept + attest batch-3" && git push
 ```
 
-It shows the ten-line digest (the key divergence per problem), asks once —
-sign **[a]ll** as faithful, **[r]eview** each packet inline, or **[q]uit** —
-then signs under your key, commits the signed state, assembles the FC branch,
-and (after one y/N) pushes and opens the PR. Two keystrokes, both yours.
+After that, Claude assembles the FC branch with plain git and hands you the
+`gh pr create` line (your account sends it). Claim the batch on FC #3998 first
+if you haven't:
+
+> Working on statements for Erdős problems 24, 93, 164, 314, 315, 333, 369,
+> 401, 429, 435 (same conventions as #4319/#4343/#4345).
+
+## Still open from before
+
+- **#4345 unblock**: reply to Smetalo — yes, it resolves #469 (adds 280.lean);
+  add "Closes #469" to the PR body.
+- **#4343**: awaiting mo271 re-review (your fixes are pushed).
