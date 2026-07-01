@@ -321,19 +321,14 @@
     "erdos_url": "https://www.erdosproblems.com/164",
     "fc_status": "proved (Lean)",
     "fc_bucket": "hypothesis-conditional",
-    "headline_decl": "Erdos164.erdos_strong_on_pRough_multiples_of_prime_of_bound",
-    "machine_verdict": "conditional",
+    "headline_decl": "Erdos164.erdos164",
+    "machine_verdict": "unconditional",
     "axiom_verdict": "kernel_clean",
     "non_kernel_axioms": [],
-    "named_assumptions": [
-      "hA : Erdos164.PrimitiveSet A"
-    ],
-    "preconditions": [
-      "hp : Nat.Prime p",
-      "hbound : \u2200 {n : \u2115}, 1 \u2264 n \u2192 Erdos164.IsPRough p n \u2192 Erdos164.roughKernelSeries p n \u2264 1 / Real.log \u2191(p * n)",
-      "hA_sub : A \u2286 {m | p \u2223 m \u2227 Erdos164.IsPRough p (m / p)}"
-    ],
+    "named_assumptions": [],
+    "preconditions": [],
     "all_decls": {
+      "Erdos164.erdos164": "unconditional",
       "Erdos164.erdos_strong_of_two": "unconditional",
       "Erdos164.erdos_strong_on_pRough_multiples_of_prime_of_bound": "conditional",
       "Erdos164.erdos_strong_on_pRough_multiples_of_odd_prime": "conditional",
@@ -784,15 +779,14 @@
     "erdos_url": "https://www.erdosproblems.com/296",
     "fc_status": "proved (Lean)",
     "fc_bucket": "hypothesis-conditional",
-    "headline_decl": "Erdos296.erdos296_upper_bound",
-    "machine_verdict": "conditional",
+    "headline_decl": "Erdos296.erdos296",
+    "machine_verdict": "unconditional",
     "axiom_verdict": "kernel_clean",
     "non_kernel_axioms": [],
-    "named_assumptions": [
-      "h : Erdos296.HasDisjointUnitDecomps N k"
-    ],
+    "named_assumptions": [],
     "preconditions": [],
     "all_decls": {
+      "Erdos296.erdos296": "unconditional",
       "Erdos296.erdos296_upper_bound": "conditional",
       "Erdos296.bloom_quantitative": "unconditional"
     }

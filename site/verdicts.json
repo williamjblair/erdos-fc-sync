@@ -5435,7 +5435,7 @@
       "wiki_outcome": null
     },
     {
-      "bucket": "hypothesis-conditional",
+      "bucket": "statement",
       "discrepancy": false,
       "erdos_state": "proved (Lean)",
       "erdos_url": "https://www.erdosproblems.com/164",
@@ -5448,10 +5448,8 @@
       "gpt_erdos": null,
       "held_for_review": false,
       "machine_source": "plby",
-      "machine_verdict": "conditional",
-      "named_assumptions": [
-        "hA : Erdos164.PrimitiveSet A"
-      ],
+      "machine_verdict": "unconditional",
+      "named_assumptions": [],
       "non_kernel_axioms": [],
       "problem": 164,
       "proof_link": null,
@@ -5475,7 +5473,7 @@
           "url": "https://github.com/Jayyhk/erdos-lean/blob/main/problems/164/Erdos164.lean"
         }
       ],
-      "recommended_action": "Do not add a formal_proof link; document or wait for an unconditional theorem.",
+      "recommended_action": "Write the FC statement and link the matching hosted proof.",
       "signed_by": null,
       "signed_fidelity_verdict": null,
       "wiki_ai_systems": [
@@ -10025,7 +10023,7 @@
       "wiki_outcome": null
     },
     {
-      "bucket": "hypothesis-conditional",
+      "bucket": "statement",
       "discrepancy": false,
       "erdos_state": "proved (Lean)",
       "erdos_url": "https://www.erdosproblems.com/296",
@@ -10038,10 +10036,8 @@
       "gpt_erdos": null,
       "held_for_review": false,
       "machine_source": "plby",
-      "machine_verdict": "conditional",
-      "named_assumptions": [
-        "h : Erdos296.HasDisjointUnitDecomps N k"
-      ],
+      "machine_verdict": "unconditional",
+      "named_assumptions": [],
       "non_kernel_axioms": [],
       "problem": 296,
       "proof_link": null,
@@ -10065,7 +10061,7 @@
           "url": "https://github.com/Jayyhk/erdos-lean/blob/main/problems/296/Erdos296.lean"
         }
       ],
-      "recommended_action": "Do not add a formal_proof link; document or wait for an unconditional theorem.",
+      "recommended_action": "Write the FC statement and link the matching hosted proof.",
       "signed_by": null,
       "signed_fidelity_verdict": null,
       "wiki_ai_systems": [
@@ -41603,10 +41599,8 @@
     "axiom_clean_but_conditional": [
       94,
       115,
-      164,
       224,
       281,
-      296,
       350,
       785,
       964,
@@ -41819,17 +41813,6 @@
       },
       {
         "description": "",
-        "key": "HasDisjointUnitDecomps",
-        "kind": "hypothesis",
-        "leverage": 1,
-        "name": "HasDisjointUnitDecomps",
-        "problems": [
-          296
-        ],
-        "tier": "hypothesis"
-      },
-      {
-        "description": "",
         "key": "is_adjacent",
         "kind": "hypothesis",
         "leverage": 1,
@@ -41858,17 +41841,6 @@
         "name": "Prime",
         "problems": [
           1187
-        ],
-        "tier": "hypothesis"
-      },
-      {
-        "description": "",
-        "key": "PrimitiveSet",
-        "kind": "hypothesis",
-        "leverage": 1,
-        "name": "PrimitiveSet",
-        "problems": [
-          164
         ],
         "tier": "hypothesis"
       },
@@ -41939,7 +41911,7 @@
     ],
     "gpt_erdos_problems": 57,
     "held_for_review": [],
-    "machine_conditional": 25,
+    "machine_conditional": 23,
     "problems": 1217,
     "signed_fidelity": [
       {

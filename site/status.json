@@ -6,7 +6,7 @@
     "defer": 0,
     "docstring": 11,
     "done": 91,
-    "hypothesis-conditional": 13,
+    "hypothesis-conditional": 11,
     "in-pr": 0,
     "link": 0,
     "mismatch": 2,
@@ -14,7 +14,7 @@
     "needs-statement-update": 1,
     "no-proof": 985,
     "partial": 9,
-    "statement": 99,
+    "statement": 101,
     "wont-fix": 1
   },
   "coverage_gap": [],
@@ -5608,7 +5608,7 @@
       "wiki": null
     },
     {
-      "bucket": "hypothesis-conditional",
+      "bucket": "statement",
       "candidate_claims": null,
       "claims": [],
       "discrepancy": false,
@@ -5627,12 +5627,10 @@
       "held_for_review": false,
       "latex_url": "https://www.erdosproblems.com/latex/164",
       "machine": {
-        "named_assumptions": [
-          "hA : Erdos164.PrimitiveSet A"
-        ],
+        "named_assumptions": [],
         "non_kernel_axioms": [],
         "source": "plby",
-        "verdict": "conditional"
+        "verdict": "unconditional"
       },
       "override": null,
       "problem": 164,
@@ -5660,7 +5658,7 @@
         "plby",
         "jayyhk"
       ],
-      "recommended_action": "Do not add a formal_proof link; document or wait for an unconditional theorem.",
+      "recommended_action": "Write the FC statement and link the matching hosted proof.",
       "source_tags": "\u1d56\u02b2",
       "wiki": {
         "ai_systems": [
@@ -10464,7 +10462,7 @@
       "wiki": null
     },
     {
-      "bucket": "hypothesis-conditional",
+      "bucket": "statement",
       "candidate_claims": null,
       "claims": [],
       "discrepancy": false,
@@ -10483,12 +10481,10 @@
       "held_for_review": false,
       "latex_url": "https://www.erdosproblems.com/latex/296",
       "machine": {
-        "named_assumptions": [
-          "h : Erdos296.HasDisjointUnitDecomps N k"
-        ],
+        "named_assumptions": [],
         "non_kernel_axioms": [],
         "source": "plby",
-        "verdict": "conditional"
+        "verdict": "unconditional"
       },
       "override": null,
       "problem": 296,
@@ -10516,7 +10512,7 @@
         "plby",
         "jayyhk"
       ],
-      "recommended_action": "Do not add a formal_proof link; document or wait for an unconditional theorem.",
+      "recommended_action": "Write the FC statement and link the matching hosted proof.",
       "source_tags": "\u1d56\u02b2",
       "wiki": {
         "ai_systems": [

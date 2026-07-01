@@ -51,6 +51,16 @@ STATUS = SP.parent / "site" / "status.json"
 # `#print axioms answer_is_yes` is kernel-clean). Pinning it flips 347 to
 # unconditional: it was a FALSE positive in the discrepancy view, not a conditional
 # proof. The keep-prefix missed `answer_is_yes` (no `erdos_`/`main_theorem` prefix).
+#
+# #164, #296: same shape as #347, found by the mispick sweep. The boxed answers
+# `erdos164` and `erdos296` are closed, argument-free, kernel-clean theorems (the
+# file's own `#print axioms` targets) — genuinely unconditional. The heuristic
+# instead picked a conditional helper (`erdos_strong_on_pRough…`, `erdos296_upper_bound`)
+# because the boxed names have no underscore after `erdos`, so the `erdos_` keep-prefix
+# misses them. Hand-verified: each boxed theorem states the full problem with no
+# hypothesis parameter. (Not fixed here: #94/#785 whose boxed answers still carry a
+# problem hypothesis, so `conditional` is correct; #1080 whose answer is a negation
+# the extractor's forallTelescope cannot read cleanly.)
 REPOS = {
     "plby": {
         "root_env": "VELA_PROOF_REPO",
@@ -58,7 +68,8 @@ REPOS = {
         "glob": "ErdosProblems/Erdos[0-9]*.lean",
         "num_re": r"Erdos(\d+)",
         "keep": ("erdos_", "main_theorem", "not_erdos"),
-        "headline_override": {997: "erdos997", 347: "answer_is_yes"},
+        "headline_override": {997: "erdos997", 347: "answer_is_yes",
+                              164: "erdos164", 296: "erdos296"},
     },
     "alphaproof": {
         "root_env": "VELA_PROOF_REPO_ALPHAPROOF",
