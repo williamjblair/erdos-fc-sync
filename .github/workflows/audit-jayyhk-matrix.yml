@@ -1,0 +1,132 @@
+name: Audit Jayyhk (toolchain matrix)
+
+# Lever 2 of the campaign: audit all ~199 Jayyhk/erdos-lean proofs. Each
+# problems/<n>/ is its own lake project pinned to its own toolchain + Mathlib,
+# so the audit is a MATRIX: one job per toolchain group (big groups sharded to
+# fit the 6h job limit), each provisioning its own Mathlib once (`lake exe
+# cache get` shares the download across projects on the same revision), then a
+# merge job that combines the partial feeds into lean/audit_feed_jayyhk.json.
+#
+# Manual dispatch. Expensive (each group builds a multi-GB Mathlib) — run when
+# the Jayyhk corpus moves, not on a schedule.
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { tc: v4.24.0, shard: 0, of: 3 }
+          - { tc: v4.24.0, shard: 1, of: 3 }
+          - { tc: v4.24.0, shard: 2, of: 3 }
+          - { tc: v4.28.0, shard: 0, of: 2 }
+          - { tc: v4.28.0, shard: 1, of: 2 }
+          - { tc: v4.27.0, shard: 0, of: 1 }
+          - { tc: "v4.29.1 v4.29.0 v4.28.1", shard: 0, of: 1 }
+          - { tc: "v4.30.0 v4.30.0-rc1 v4.25.0-rc2", shard: 0, of: 1 }
+          - { tc: "v4.22.0 v4.21.0 v4.23.0", shard: 0, of: 1 }
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan
+        run: |
+          curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Cache toolchains + mathlib oleans
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.elan
+            ~/.cache/mathlib
+          key: jayyhk-${{ runner.os }}-${{ matrix.tc }}-v1
+          restore-keys: jayyhk-${{ runner.os }}-
+
+      - name: Clone Jayyhk
+        run: git clone --depth 1 https://github.com/Jayyhk/erdos-lean.git "$HOME/erdos-lean"
+
+      - name: Build the toolchain group (shard ${{ matrix.shard }}/${{ matrix.of }})
+        env:
+          JAYYHK: /home/runner/erdos-lean
+          SHARD_IDX: ${{ matrix.shard }}
+          SHARD_TOT: ${{ matrix.of }}
+        run: bash lean/build-jayyhk.sh ${{ matrix.tc }}
+
+      - name: Audit the built projects
+        env:
+          VELA_PROOF_REPO_JAYYHK: /home/runner/erdos-lean
+        run: python3 lean/extract_assumptions.py --repo jayyhk
+
+      - name: Upload partial feed
+        uses: actions/upload-artifact@v4
+        with:
+          name: feed-${{ strategy.job-index }}
+          path: lean/audit_feed_jayyhk.json
+
+  merge:
+    needs: audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: partial-feeds
+      - name: Merge partial feeds
+        run: |
+          python3 - <<'EOF'
+          import json, pathlib
+          rows = {}
+          # keep the committed feed's rows too (local audits already landed)
+          base = pathlib.Path("lean/audit_feed_jayyhk.json")
+          if base.exists():
+              for r in json.loads(base.read_text()):
+                  rows[r["problem"]] = r
+          for f in sorted(pathlib.Path("partial-feeds").rglob("audit_feed_jayyhk.json")):
+              for r in json.loads(f.read_text()):
+                  rows[r["problem"]] = r
+          merged = [rows[k] for k in sorted(rows)]
+          base.write_text(json.dumps(merged, indent=2))
+          print(f"merged {len(merged)} jayyhk verdicts")
+          EOF
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --all-groups
+      - name: Regenerate the join + refresh the golden
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          uv run python erdos_frontier.py
+          # New verdicts are a reviewed act: regenerate the golden HERE so the
+          # PR diff shows exactly which verdicts appeared/changed, and the
+          # human review of that diff IS the act. Main is never pushed directly.
+          uv run python -c "import json; from erdos_frontier import load_machine_audit; json.dump({str(p):r['machine_verdict'] for p,r in sorted(load_machine_audit().items())}, open('tests/golden_machine_verdicts.json','w'), indent=2, sort_keys=True)"
+          uv run pytest -q
+
+      # Open a PR rather than pushing main: the golden-drift diff is the review
+      # surface, and merging the PR is the reviewed acceptance of the verdicts.
+      - name: Open the review PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet; then echo "No feed changes."; exit 0; fi
+          BRANCH="jayyhk-matrix-$(date -u +%Y%m%d-%H%M)"
+          git checkout -b "$BRANCH"
+          git add lean/audit_feed_jayyhk.json site/ tests/golden_machine_verdicts.json sources.lock.json
+          git commit -m "Jayyhk matrix audit: merged verdicts ($(date -u +%Y-%m-%d))"
+          git push -u origin "$BRANCH"
+          gh pr create --title "Jayyhk matrix audit ($(date -u +%Y-%m-%d))" \
+            --body "Merged per-toolchain audit feeds. The golden diff below is the set of new/changed machine verdicts — review it; merging accepts them. Overclaims (declared complete, machine conditional) are flagged in the job log." \
+            --base main --head "$BRANCH"

@@ -16,10 +16,17 @@ build_proofs / proof_url) so the packet never drifts from the computed status.
 Usage:
     python match_packet.py 214            # one problem
     python match_packet.py                # all rows needing a match-check
+    python match_packet.py --draft 24 93  # campaign drafts (statements/<n>/)
+
+`--draft` is the campaign's S3 gate: panel 2 becomes the STAGED draft statement
+(inlined from statements/<n>/<n>.lean) with the drafter's divergence notes
+surfaced, and the verdict stub is hash-bound to the exact draft bytes so the
+signed vsa_ pins what was reviewed.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -196,7 +203,104 @@ def verdict_stub(row: dict) -> dict:
     }
 
 
+DRAFT_DIR = Path("statements")
+DRAFT_PACKET_DIR = Path("packets/draft-review")
+
+
+def render_draft_packet(problem: int, row: dict | None) -> str:
+    """The S3 fidelity packet for a STAGED campaign draft."""
+    ddir = DRAFT_DIR / str(problem)
+    draft = json.loads((ddir / "draft.json").read_text())
+    lean = (ddir / f"{problem}.lean").read_text()
+    out: list[str] = []
+    out.append(f"# Draft-review packet — Erdős problem {problem}\n")
+    out.append(f"Campaign draft (statements/{problem}/). The verdict you sign is "
+               "hash-bound to the exact draft bytes below — any post-sign edit "
+               "invalidates it and must re-gate.\n")
+    out.append(f"- Upstream state: `{draft.get('upstream_state')}`")
+    out.append(f"- Machine verdict on the hosted proof: `{draft.get('machine_verdict')}` "
+               f"(source `{draft.get('machine_source')}`)")
+    out.append(f"- formal_proof link allowed: `{draft.get('link_allowed')}`\n")
+
+    out.append("## 1. Upstream statement (the boxed problem)\n")
+    out.append(f"- https://www.erdosproblems.com/{problem}")
+    out.append(f"- LaTeX: https://www.erdosproblems.com/latex/{problem}")
+    out.append(f"- Full verbatim text: `statements/{problem}/inputs.md`\n")
+
+    out.append("## 2. THE DRAFT (judge this)\n")
+    out.append("```lean")
+    out.append(lean.rstrip())
+    out.append("```\n")
+
+    notes = draft.get("divergence_notes") or []
+    out.append("## Drafter's divergence notes (vs the hosted theorems)\n")
+    if notes:
+        for n in notes:
+            out.append(f"- {n}")
+    else:
+        out.append("- _none recorded — verify that is actually true_")
+    out.append("")
+
+    out.append("## 3. Hosted theorem(s) — the shape priors\n")
+    for h in draft.get("hosted") or []:
+        out.append(f"- {h.get('source')}: {h.get('url')}")
+    out.append(f"- Extracts inlined in `statements/{problem}/inputs.md`\n")
+
+    out.append("## Decision — statement fidelity of THE DRAFT (L2)\n")
+    out.append(
+        "- [ ] faithful — the draft states the boxed problem; submit.\n"
+        "- [ ] variant — needs redraft (say what diverges).\n"
+        "- [ ] unfaithful — reject (record why in campaign.yaml).\n")
+    return "\n".join(out)
+
+
+def draft_verdict_stub(problem: int) -> dict:
+    ddir = DRAFT_DIR / str(problem)
+    draft = json.loads((ddir / "draft.json").read_text())
+    lean_bytes = (ddir / f"{problem}.lean").read_bytes()
+    return {
+        "target": None,
+        "verdict": "",
+        "informal_ref": f"erdosproblems.com/{problem}",
+        "formal_ref": f"campaign-draft:statements/{problem}/{problem}.lean",
+        "formal_statement_hash": hashlib.sha256(lean_bytes).hexdigest(),
+        "note": ("campaign draft; machine verdict on hosted proof: "
+                 f"{draft.get('machine_verdict')} ({draft.get('machine_source')})"),
+    }
+
+
+def draft_main(problems: list[int]) -> int:
+    DRAFT_PACKET_DIR.mkdir(parents=True, exist_ok=True)
+    stubs = []
+    for n in problems:
+        ddir = DRAFT_DIR / str(n)
+        if not (ddir / f"{n}.lean").exists():
+            print(f"!! {n}: no staged draft")
+            continue
+        draft = json.loads((ddir / "draft.json").read_text())
+        if draft.get("status") not in ("drafted", "gated"):
+            print(f"!! {n}: draft status is {draft.get('status')!r} (want drafted/gated)")
+            continue
+        gates = ddir / "gates.json"
+        if not (gates.exists() and json.loads(gates.read_text()).get("passed")):
+            print(f"!! {n}: mechanical gates not green — run scripts/gate_draft.sh {n}")
+            continue
+        path = DRAFT_PACKET_DIR / f"erdos_{n}.md"
+        path.write_text(render_draft_packet(n, None))
+        stubs.append(draft_verdict_stub(n))
+        print(f"wrote {path}")
+    if stubs:
+        stub_path = DRAFT_PACKET_DIR / "verdicts_stub.jsonl"
+        stub_path.write_text("\n".join(json.dumps(s) for s in stubs) + "\n")
+        print(f"wrote {stub_path} ({len(stubs)} rows) — fill verdict+target, then "
+              "`vela attest . --batch packets/draft-review/verdicts_stub.jsonl "
+              "--as reviewer:will-blair`")
+    return 0
+
+
 def main(argv: list[str]) -> int:
+    if len(argv) > 1 and argv[1] == "--draft":
+        return draft_main([int(a) for a in argv[2:]])
     problem = int(argv[1]) if len(argv) > 1 else None
     payload = load_live_status()
     rows = select_rows(payload, problem)

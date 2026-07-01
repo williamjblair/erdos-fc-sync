@@ -1,0 +1,35 @@
+{
+  "problem": 401,
+  "status": "staged",
+  "staged_at": "2026-07-01T20:38:54+00:00",
+  "upstream_state": "proved (Lean)",
+  "latex_sha256": "0a8c94afe2dbf162b1c1617d64f06b79ddf11fcbef857177a8e0fd7178658a27",
+  "machine_verdict": "unconditional",
+  "machine_source": "plby",
+  "link_allowed": true,
+  "hosted": [
+    {
+      "source": "plby",
+      "url": "https://github.com/plby/lean-proofs/blob/main/src/v4.29.1/ErdosProblems/Erdos401.lean",
+      "file_sha256": "a69548de42fd416e622880adb54b68d171079f7c5ee75e52c69cae28fc0691f2",
+      "error": null
+    },
+    {
+      "source": "jayyhk",
+      "url": "https://github.com/Jayyhk/erdos-lean/blob/main/problems/401/Erdos401.lean",
+      "file_sha256": "03720dcdc383bccde8c70f39cfecdb7ee196853894bb7c7cab88362e7017186d",
+      "error": null
+    }
+  ],
+  "collision": {
+    "checked_at": "2026-07-01T20:38:53+00:00",
+    "open_prs": [],
+    "issues": [
+      {
+        "number": 712,
+        "title": "Erd\u0151s Problem 401"
+      }
+    ]
+  },
+  "divergence_notes": []
+}

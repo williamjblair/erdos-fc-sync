@@ -1,0 +1,35 @@
+{
+  "problem": 369,
+  "status": "staged",
+  "staged_at": "2026-07-01T20:38:53+00:00",
+  "upstream_state": "proved (Lean)",
+  "latex_sha256": "e4a56d6dfe15b8563c1788b041cf946d1ccc8e7b2fca7356778bf0ce6beb0614",
+  "machine_verdict": "unconditional",
+  "machine_source": "plby",
+  "link_allowed": true,
+  "hosted": [
+    {
+      "source": "plby",
+      "url": "https://github.com/plby/lean-proofs/blob/main/src/v4.29.1/ErdosProblems/Erdos369.lean",
+      "file_sha256": "e96520d4d016b10c57493f09f78a6fab0ede44f2cb5a261627dac43754fa3fc3",
+      "error": null
+    },
+    {
+      "source": "jayyhk",
+      "url": "https://github.com/Jayyhk/erdos-lean/blob/main/problems/369/Erdos369.lean",
+      "file_sha256": "d67b7fda6c6940b82860f7e17909e4fcb0a5a4c928989763b841dece117fb1fd",
+      "error": null
+    }
+  ],
+  "collision": {
+    "checked_at": "2026-07-01T20:38:51+00:00",
+    "open_prs": [],
+    "issues": [
+      {
+        "number": 697,
+        "title": "Erd\u0151s Problem 369"
+      }
+    ]
+  },
+  "divergence_notes": []
+}

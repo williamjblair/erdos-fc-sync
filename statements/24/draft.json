@@ -1,0 +1,39 @@
+{
+  "problem": 24,
+  "status": "staged",
+  "staged_at": "2026-07-01T20:38:44+00:00",
+  "upstream_state": "proved (Lean)",
+  "latex_sha256": "6439096b1928c2b6a5823d86e84ce490dc0daae0d863df3435a1d8ad4989b26b",
+  "machine_verdict": "unconditional",
+  "machine_source": "plby",
+  "link_allowed": true,
+  "hosted": [
+    {
+      "source": "plby",
+      "url": "https://github.com/plby/lean-proofs/blob/main/src/v4.29.1/ErdosProblems/Erdos24.lean",
+      "file_sha256": "784ec3dd26b00c078cabdda69d209d99760560537a0606f88ec83c741eab16fc",
+      "error": null
+    },
+    {
+      "source": "jayyhk",
+      "url": "https://github.com/Jayyhk/erdos-lean/blob/main/problems/24/Erdos24.lean",
+      "file_sha256": "d808d437c960ba42b546737e10df679f9ba9161e0aa8d41cbaa4a8d80d78a1ed",
+      "error": null
+    }
+  ],
+  "collision": {
+    "checked_at": "2026-07-01T20:38:38+00:00",
+    "open_prs": [],
+    "issues": [
+      {
+        "number": 2017,
+        "title": "Kourovka 2.24"
+      },
+      {
+        "number": 3440,
+        "title": "Formalize Open Quantum Problem #24: Secret key from all entangled states"
+      }
+    ]
+  },
+  "divergence_notes": []
+}

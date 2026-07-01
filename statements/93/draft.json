@@ -1,0 +1,35 @@
+{
+  "problem": 93,
+  "status": "staged",
+  "staged_at": "2026-07-01T20:38:46+00:00",
+  "upstream_state": "proved (Lean)",
+  "latex_sha256": "cb1ec62b5d4cbe2119d1fe67fa62426c7e7725635b63126e5791257eaacb75fb",
+  "machine_verdict": "unconditional",
+  "machine_source": "plby",
+  "link_allowed": true,
+  "hosted": [
+    {
+      "source": "plby",
+      "url": "https://github.com/plby/lean-proofs/blob/main/src/v4.29.1/ErdosProblems/Erdos93.lean",
+      "file_sha256": "bdb4878dfe4ef5afb84b72527b948b5c8aa3ac795df9110f2ff8a50b248aa99d",
+      "error": null
+    },
+    {
+      "source": "jayyhk",
+      "url": "https://github.com/Jayyhk/erdos-lean/blob/main/problems/93/Erdos93.lean",
+      "file_sha256": "ff32143cb3513d4aee1025f4ab3dfae2f4f5adcb75fcf49aba78aa18eebbfdae",
+      "error": null
+    }
+  ],
+  "collision": {
+    "checked_at": "2026-07-01T20:38:44+00:00",
+    "open_prs": [],
+    "issues": [
+      {
+        "number": 1749,
+        "title": "Green's Open Problems #93"
+      }
+    ]
+  },
+  "divergence_notes": []
+}

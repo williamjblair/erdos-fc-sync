@@ -1,0 +1,35 @@
+{
+  "problem": 333,
+  "status": "staged",
+  "staged_at": "2026-07-01T20:38:51+00:00",
+  "upstream_state": "disproved (Lean)",
+  "latex_sha256": "cfc91078f915163a6e065b02b646f2168ecf51b3fe5c9efb694b91d0fec29a66",
+  "machine_verdict": "unconditional",
+  "machine_source": "plby",
+  "link_allowed": true,
+  "hosted": [
+    {
+      "source": "plby",
+      "url": "https://github.com/plby/lean-proofs/blob/main/src/v4.29.1/ErdosProblems/Erdos333.lean",
+      "file_sha256": "2636f4c2abef1a29a22c2a4fba15e7d64de69edaaa91853a31460245c4821ee0",
+      "error": null
+    },
+    {
+      "source": "jayyhk",
+      "url": "https://github.com/Jayyhk/erdos-lean/blob/main/problems/333/Erdos333.lean",
+      "file_sha256": "a30f6d22508a8a2be1a7da59bc50617e5b9058b5ec9bd5e1c452ed64d17cbac8",
+      "error": null
+    }
+  ],
+  "collision": {
+    "checked_at": "2026-07-01T20:38:50+00:00",
+    "open_prs": [],
+    "issues": [
+      {
+        "number": 493,
+        "title": "Erd\u0151s Problem 333"
+      }
+    ]
+  },
+  "divergence_notes": []
+}

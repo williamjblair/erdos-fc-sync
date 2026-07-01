@@ -1,0 +1,30 @@
+{
+  "problem": 429,
+  "status": "staged",
+  "staged_at": "2026-07-01T20:38:55+00:00",
+  "upstream_state": "disproved (Lean)",
+  "latex_sha256": "fd61e89fbb71bff5be48f9ad4988ed4ac13cb4269836f50a5527209ce9f28324",
+  "machine_verdict": "unconditional",
+  "machine_source": "plby",
+  "link_allowed": true,
+  "hosted": [
+    {
+      "source": "plby",
+      "url": "https://github.com/plby/lean-proofs/blob/main/src/v4.29.1/ErdosProblems/Erdos429.lean",
+      "file_sha256": "a124655d48170d800bb1a22296e74968af4ceaf2cb816e0b691eac05fcd4df3d",
+      "error": null
+    },
+    {
+      "source": "jayyhk",
+      "url": "https://github.com/Jayyhk/erdos-lean/blob/main/problems/429/Erdos429.lean",
+      "file_sha256": "27e50d43fdd089738758ceaec5f723774ddf12160e5f7cf78571ace92beec38f",
+      "error": null
+    }
+  ],
+  "collision": {
+    "checked_at": "2026-07-01T20:38:54+00:00",
+    "open_prs": [],
+    "issues": []
+  },
+  "divergence_notes": []
+}

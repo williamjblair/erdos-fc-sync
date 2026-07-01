@@ -1,0 +1,50 @@
+# The Erdős formalization campaign manifest — the single source of truth for
+# batch state. Buckets/candidates come from the daily join (status.json); this
+# file records what the campaign has DONE with them: which problems are in
+# which batch, where each batch stands, and the provenance refs (PRs, packets,
+# signed verdicts). The state machine per batch:
+#
+#   selected -> drafted -> gated -> packeted -> signed -> pr-open -> merged -> done
+#
+# Rules encoded here (see the plan): batches of 8-12; max 2 campaign PRs open;
+# claim each batch by comment on FC issue #3998 BEFORE drafting; formal_proof
+# links only for machine-unconditional proofs with a signed faithful vsa_.
+
+umbrella_issue: https://github.com/google-deepmind/formal-conjectures/issues/3998
+
+batches:
+  # --- history (pre-manifest) -------------------------------------------------
+  - name: batch-1
+    state: merged
+    pr: https://github.com/google-deepmind/formal-conjectures/pull/4319
+    problems: [178, 214, 245, 257, 290, 351, 459, 499, 674, 686, 1150]
+    note: The conventions-calibration batch; mo271's review nits became the house template.
+
+  - name: batch-2a
+    state: pr-open
+    pr: https://github.com/google-deepmind/formal-conjectures/pull/4343
+    problems: [199, 224, 226, 246, 296, 363]
+    note: mo271 review comments addressed (199/224/226); awaiting re-review.
+
+  - name: batch-2b
+    state: pr-open
+    pr: https://github.com/google-deepmind/formal-conjectures/pull/4345
+    problems: [31, 34, 47, 280]
+    note: |
+      Unreviewed. Smetalo asked whether it resolves #469 (a request for problem
+      280) — it does; Will to reply + add "Closes #469" to the PR body.
+
+  # --- the campaign proper ----------------------------------------------------
+  - name: batch-3
+    state: selected
+    problems: [24, 93, 164, 314, 315, 333, 369, 401, 429, 435]
+    note: |
+      First manifest-driven batch. All ten machine-verified unconditional (plby)
+      with dual hosted sources (plby + jayyhk) — two independent theorems to
+      cross-check per problem. Selected 2026-07-01 from the claims-fresh join
+      (statement bucket = 66 after excluding 318 in-pr problems).
+
+# Next clean candidates (claims-fresh, in batch_rank order) — batch-4 seeds:
+# audited-unconditional: [443, 484, ...]; jayyhk-only unaudited (wait for the
+# CI matrix to audit before linking; statement-only otherwise): [71, 206, 209,
+# 328, 353, 403, 426, 464, ...]
