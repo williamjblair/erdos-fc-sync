@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Load-bearing conditions · Erdős formal-proof fidelity audit</title>
+<style>
+  :root{
+    color-scheme: light dark;
+    --paper:#faf8f3; --ink:#1b1916; --faint:#6f675c; --hair:#dcd5c8;
+    --accent:#9a3b2e; --accent-bg:#9a3b2e12; --ok:#5b6e4f; --warn:#9a7b2e;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#15120e; --ink:#e9e3d8; --faint:#9a9082; --hair:#332c23;
+           --accent:#d2735f; --accent-bg:#d2735f1a; --ok:#9fb18c; --warn:#cbab63; }
+  }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--paper); color:var(--ink);
+    font:17px/1.6 "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    -webkit-font-smoothing:antialiased; }
+  .wrap{ max-width:64rem; margin:0 auto; padding:4.5rem 1.6rem 6rem; }
+  code,.mono{ font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:.86em; }
+  a{ color:inherit; text-decoration-color:var(--hair); text-underline-offset:2px; }
+  a:hover{ text-decoration-color:var(--accent); }
+  .nav{ font-size:.85rem; color:var(--faint); margin-bottom:2.4rem; }
+  .nav a{ margin-right:1.1rem; }
+  h1{ font-size:2.1rem; font-weight:600; letter-spacing:-.01em; margin:0 0 .4rem; }
+  .dek{ color:var(--faint); font-size:1.12rem; margin:0 0 2.4rem; max-width:44rem; }
+  h2{ font-size:1.05rem; font-weight:600; margin:2.8rem 0 .3rem; }
+  h2 .sub{ font-weight:400; color:var(--faint); font-size:.85rem; margin-left:.5rem; }
+  .note{ color:var(--faint); font-size:.85rem; max-width:44rem; margin:.2rem 0 1.2rem; }
+
+  .map{ border-top:1px solid var(--hair); border-bottom:1px solid var(--hair);
+    padding:1.4rem 0; margin:1.2rem 0 2rem; overflow-x:auto; }
+  .map svg{ display:block; margin:0 auto; max-width:100%; }
+  .map .clabel{ font:500 12.5px ui-monospace,monospace; fill:var(--ink); }
+  .map .plabel{ font:500 12.5px ui-monospace,monospace; fill:var(--faint); }
+  .map .edge{ stroke:var(--hair); stroke-width:1; fill:none; }
+  .map .edge.shared{ stroke:var(--accent); stroke-width:1.4; }
+  .map .node{ fill:var(--faint); }
+  .map .node.shared{ fill:var(--accent); }
+  .map g.cond{ cursor:default; }
+  .map g.cond:hover .edge{ stroke:var(--accent); stroke-width:1.6; }
+  .map g.cond:hover .clabel{ fill:var(--accent); }
+
+  ul.conds{ list-style:none; margin:0; padding:0; }
+  ul.conds li{ padding:.7rem 0; border-bottom:1px solid var(--hair); display:flex; gap:1rem; align-items:baseline; }
+  .lev{ font-family:ui-monospace,monospace; font-size:.78rem; color:var(--accent);
+    border:1px solid var(--hair); border-radius:3px; padding:.05rem .4rem; white-space:nowrap; flex-shrink:0; min-width:3.3rem; text-align:center; }
+  .lev.one{ color:var(--faint); }
+  .cbody{ flex:1; }
+  .cname{ font-weight:600; }
+  .cdesc{ color:var(--faint); font-size:.9rem; }
+  .cprobs{ font-family:ui-monospace,monospace; font-size:.82rem; margin-top:.15rem; }
+  .cprobs a{ margin-right:.5rem; }
+  .foot{ margin-top:3rem; padding-top:1.4rem; border-top:1px solid var(--hair);
+    color:var(--faint); font-size:.85rem; }
+  @media (max-width:640px){ .wrap{ padding:2.6rem 1.1rem 4rem; } ul.conds li{ flex-wrap:wrap; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="nav"><a href="index.html">← Overview</a><a href="index.html">All problems</a></div>
+  <h1>Load-bearing conditions</h1>
+  <p class="dek">The unproven inputs the formal proofs rest on. Formalize one, and every
+  problem that assumes it becomes unconditional.</p>
+
+  <div class="map" id="map"></div>
+
+  <h2>Assumed theorems <span class="sub" id="thm-count"></span></h2>
+  <p class="note">Named results a proof takes as given — as an axiom, or as a
+  hypothesis it never discharges. These are the frontier's real dependencies: each
+  is a known theorem not yet in Mathlib, and formalizing it clears the problems that
+  cite it.</p>
+  <ul class="conds" id="theorems"></ul>
+
+  <h2>Undischarged hypotheses <span class="sub" id="hyp-count"></span></h2>
+  <p class="note">A proof here carries a problem-specific hypothesis it did not
+  prove. Unlike the assumed theorems above, these are internal to one problem, so
+  they are a fidelity concern for that proof rather than a shared input to formalize.</p>
+  <ul class="conds" id="hypotheses"></ul>
+
+  <h2>Compiler trust <span class="sub" id="comp-count"></span></h2>
+  <p class="note">Not a kernel proof: the argument trusts a native-compiled
+  computation (<code>native_decide</code>), which extends the trusted base beyond
+  Lean's kernel.</p>
+  <ul class="conds" id="compiler"></ul>
+
+  <p class="foot" id="foot"></p>
+</div>
+
+<script>
+function esc(s){ return String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+function problemLink(n){ return `<a href="finding.html?n=${n}" title="finding page">${n}</a>`; }
+
+function renderList(el, conds){
+  el.innerHTML = conds.map(c => {
+    const one = c.leverage === 1 ? " one" : "";
+    const probs = c.problems.map(problemLink).join(" ");
+    const desc = c.description ? `<div class="cdesc">${esc(c.description)}</div>` : "";
+    return `<li><span class="lev${one}">${c.leverage}&nbsp;prob${c.leverage===1?"":"s"}</span>`
+      + `<div class="cbody"><div class="cname">${esc(c.name)}</div>${desc}`
+      + `<div class="cprobs">${probs}</div></div></li>`;
+  }).join("") || `<li class="note">none</li>`;
+}
+
+function renderMap(conds){
+  // Bipartite: assumed theorems (left) -> problems (right). Cartography, not a cloud.
+  const rowH = 30, padTop = 18, padBot = 18, leftX = 258, rightX = 540, w = 700;
+  const probs = [...new Set(conds.flatMap(c => c.problems))].sort((a,b)=>a-b);
+  const py = {}; probs.forEach((p,i) => py[p] = padTop + i*rowH);
+  const cy = {}; conds.forEach((c,i) => cy[c.key] = padTop + i*rowH);
+  const h = padTop + padBot + Math.max(conds.length, probs.length)*rowH - rowH;
+  const edges = conds.flatMap(c => c.problems.map(p => {
+    const shared = c.leverage >= 2 ? " shared" : "";
+    const x1 = leftX+6, y1 = cy[c.key], x2 = rightX-6, y2 = py[p];
+    const mx = (x1+x2)/2;
+    return `<path class="edge${shared}" d="M${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}"/>`;
+  }));
+  const condG = conds.map(c => {
+    const shared = c.leverage >= 2 ? " shared" : "";
+    const y = cy[c.key];
+    const es = c.problems.map(p => {
+      const x1 = leftX+6, y1 = y, x2 = rightX-6, y2 = py[p], mx=(x1+x2)/2;
+      return `<path class="edge${shared}" d="M${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}"/>`;
+    }).join("");
+    return `<g class="cond">${es}`
+      + `<text class="clabel" x="${leftX}" y="${y+4}" text-anchor="end">${esc(c.name)}</text>`
+      + `<circle class="node${shared}" cx="${leftX+6}" cy="${y}" r="3"/></g>`;
+  }).join("");
+  const probG = probs.map(p => {
+    const shared = conds.some(c => c.leverage>=2 && c.problems.includes(p)) ? " shared" : "";
+    const y = py[p];
+    return `<g><circle class="node${shared}" cx="${rightX-6}" cy="${y}" r="3"/>`
+      + `<a href="finding.html?n=${p}"><text class="plabel" x="${rightX}" y="${y+4}">${p}</text></a></g>`;
+  }).join("");
+  document.getElementById("map").innerHTML =
+    `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Assumed theorems and the problems that depend on them">`
+    + `<text class="plabel" x="${leftX}" y="10" text-anchor="end" style="fill:var(--faint);font-size:10px;letter-spacing:.05em">ASSUMED THEOREM</text>`
+    + `<text class="plabel" x="${rightX}" y="10" style="fill:var(--faint);font-size:10px;letter-spacing:.05em">PROBLEM</text>`
+    + condG + probG + `</svg>`;
+}
+
+fetch("verdicts.json").then(r=>r.json()).then(d=>{
+  const conds = d.summary.conditions || [];
+  const thm = conds.filter(c => c.tier==="theorem");
+  const hyp = conds.filter(c => c.tier==="hypothesis");
+  const comp = conds.filter(c => c.tier==="compiler");
+  renderMap(thm);
+  renderList(document.getElementById("theorems"), thm);
+  renderList(document.getElementById("hypotheses"), hyp);
+  renderList(document.getElementById("compiler"), comp);
+  const shared = thm.filter(c => c.leverage>=2).length;
+  document.getElementById("thm-count").textContent =
+    `${thm.length} inputs · ${shared} shared across problems`;
+  document.getElementById("hyp-count").textContent = `${hyp.length}`;
+  document.getElementById("comp-count").textContent = `${comp.length}`;
+  document.getElementById("foot").innerHTML =
+    `Every edge is declared by the proof itself — an axiom in its <code>#print axioms</code>, `
+    + `or a hypothesis in its signature. Generated ${esc(d.generated_at)} · `
+    + `<a href="verdicts.json">verdicts.json</a> · <a href="index.html">overview</a>`;
+});
+</script>
+</body>
+</html>

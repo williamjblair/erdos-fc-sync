@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finding · Erdős formal-proof fidelity audit</title>
+<style>
+  :root{
+    color-scheme: light dark;
+    --paper:#faf8f3; --ink:#1b1916; --faint:#6f675c; --hair:#dcd5c8;
+    --accent:#9a3b2e; --accent-bg:#9a3b2e12; --ok:#5b6e4f; --warn:#9a7b2e;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#15120e; --ink:#e9e3d8; --faint:#9a9082; --hair:#332c23;
+           --accent:#d2735f; --accent-bg:#d2735f1a; --ok:#9fb18c; --warn:#cbab63; }
+  }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--paper); color:var(--ink);
+    font:17px/1.6 "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    -webkit-font-smoothing:antialiased; }
+  .wrap{ max-width:52rem; margin:0 auto; padding:4.5rem 1.6rem 6rem; }
+  code,.mono{ font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:.86em; }
+  a{ color:inherit; text-decoration-color:var(--hair); text-underline-offset:2px; }
+  a:hover{ text-decoration-color:var(--accent); }
+  .nav{ font-size:.85rem; color:var(--faint); margin-bottom:2.4rem; }
+  .nav a{ margin-right:1.1rem; }
+  h1{ font-size:2rem; font-weight:600; letter-spacing:-.01em; margin:0 0 .2rem; }
+  .sub{ color:var(--faint); font-size:1rem; margin:0 0 .8rem; }
+  .links{ font-size:.9rem; margin:0 0 2.2rem; }
+  .links a{ margin-right:1.1rem; white-space:nowrap; }
+
+  .ribbon{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--hair);
+    border:1px solid var(--hair); border-radius:5px; overflow:hidden; margin:0 0 2.4rem; }
+  .cell{ background:var(--paper); padding:.9rem 1.1rem; }
+  .cell .k{ font-size:.68rem; text-transform:uppercase; letter-spacing:.06em; color:var(--faint); }
+  .cell .v{ font-size:1.02rem; margin-top:.15rem; }
+  .cell .d{ font-size:.85rem; color:var(--faint); margin-top:.1rem; }
+  .cell.wide{ grid-column:1 / -1; }
+  .v .cond, .v .axiom{ font-family:ui-monospace,monospace; font-size:.9em; color:var(--accent); }
+  .tag{ font-family:ui-monospace,monospace; font-size:.78rem; padding:.05rem .45rem; border-radius:3px; border:1px solid var(--hair); }
+  .tag.cond{ color:var(--accent); border-color:var(--accent); }
+  .tag.uncond{ color:var(--ok); border-color:var(--ok); }
+  .tag.warn{ color:var(--warn); border-color:var(--warn); }
+  .tag.none{ color:var(--faint); }
+  .repro{ font-family:ui-monospace,monospace; font-size:.8rem; background:var(--accent-bg);
+    padding:.5rem .7rem; border-radius:4px; margin-top:.35rem; white-space:pre-wrap; word-break:break-all; }
+
+  h2{ font-size:.78rem; text-transform:uppercase; letter-spacing:.05em; color:var(--faint);
+    font-weight:600; margin:2.4rem 0 .7rem; padding-bottom:.35rem; border-bottom:1px solid var(--hair); }
+  .chain{ list-style:none; margin:0; padding:0; }
+  .chain li{ position:relative; padding:0 0 1rem 1.3rem; border-left:1px solid var(--hair); margin-left:.3rem; }
+  .chain li::before{ content:""; position:absolute; left:-4px; top:.5rem; width:7px; height:7px;
+    border-radius:50%; background:var(--faint); }
+  .chain li.on::before{ background:var(--accent); }
+  .chain .step{ font-size:.7rem; text-transform:uppercase; letter-spacing:.04em; color:var(--faint); }
+  .chain .body{ margin-top:.05rem; }
+  .chain .body .mono{ word-break:break-all; }
+  .neighbor{ font-size:.95rem; margin:.2rem 0 1rem; }
+  .neighbor .cn{ font-family:ui-monospace,monospace; color:var(--accent); }
+  .neighbor .sib a{ margin-right:.4rem; font-family:ui-monospace,monospace; font-size:.85rem; }
+  .claim{ font-size:.95rem; margin:.15rem 0; }
+  .claim .ai{ color:var(--faint); font-size:.85rem; }
+  .muted{ color:var(--faint); }
+  .foot{ margin-top:3rem; padding-top:1.4rem; border-top:1px solid var(--hair); color:var(--faint); font-size:.85rem; }
+  @media (max-width:640px){ .wrap{ padding:2.6rem 1.1rem 4rem; } .ribbon{ grid-template-columns:1fr; } .cell.wide{ grid-column:auto; } }
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <div class="nav"><a href="index.html">← Overview</a><a href="conditions.html">Conditions</a></div>
+  <div id="content"><p class="muted">Loading…</p></div>
+</div>
+
+<script>
+const COLOR = {green:"🟢", yellow:"🟡", red:"🔴", white:"⚪"};
+const GPT = {
+  new_proof:"new proof", literature:"literature", partial_literature:"partial lit.",
+  typo:"typo", hidden_constraints:"hidden constraints", non_improving:"non-improving",
+  conditional_conjecture:"conditional on conjecture", subtle_error:"subtle error",
+};
+function esc(s){ return String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+function condName(a){ return a.split(" : ").pop(); }
+
+function proofCell(r){
+  const v = r.machine_verdict;
+  if(!v) return {tag:'<span class="tag none">not audited</span>', detail:"No hosted Lean proof was machine-audited."};
+  if(v==="unconditional") return {tag:'<span class="tag uncond">unconditional</span>',
+    detail:"Kernel-clean, with no undischarged hypothesis."};
+  if(v==="incomplete") return {tag:'<span class="tag warn">incomplete</span>', detail:"The proof contains <code>sorry</code>."};
+  // conditional
+  const inv = r.named_assumptions.length && !r.non_kernel_axioms.length;
+  const conds = r.named_assumptions.length
+    ? r.named_assumptions.map(a => `<span class="cond">${esc(condName(a))}</span>`).join(", ")
+    : r.non_kernel_axioms.map(a => `<span class="axiom">${esc(a)}</span>`).join(", ");
+  const how = inv
+    ? "an undischarged hypothesis (invisible to <code>#print axioms</code>)"
+    : "a visible axiom in <code>#print axioms</code>";
+  return {tag:'<span class="tag cond">conditional</span>',
+    detail:`Holds only under ${conds} — ${how}.`};
+}
+function stmtCell(r){
+  const v = r.signed_fidelity_verdict;
+  if(!v) return {tag:'<span class="tag none">unaudited</span>', detail:"No signed statement-fidelity verdict yet."};
+  const cls = v==="faithful"?"uncond":v==="variant"?"warn":"cond";
+  const by = r.signed_by ? `Signed ${esc(r.signed_by)}.` : "Awaiting a named reviewer.";
+  const note = r.fidelity_note ? " "+esc(r.fidelity_note) : "";
+  return {tag:`<span class="tag ${cls}">${esc(v)}</span>`, detail:by+note};
+}
+
+function render(r, conds){
+  const c = document.getElementById("content");
+  document.title = `Erdős ${r.problem} · fidelity audit`;
+  const proof = proofCell(r), stmt = stmtCell(r);
+  const fcLink = r.fc_url ? `<a href="${esc(r.fc_url)}">Formal Conjectures</a>` : "";
+  const src = r.machine_source ? `audited from <code>${esc(r.machine_source)}</code>` : "no machine source";
+  const fidsrc = r.signed_fidelity_verdict
+    ? ` · fidelity from ${r.fidelity_source==="hub" ? "the live hub" : "an offline snapshot"}` : "";
+  const reproCmd = r.machine_source
+    ? `# clone the proof repo, then, in its built .lake:\npython lean/extract_assumptions.py --repo ${esc(r.machine_source)}\n# the boxed theorem's own #print axioms is the ground truth`
+    : "No machine-audited proof to reproduce.";
+
+  // proof chain
+  const chain = [];
+  chain.push(`<li class="on"><div class="step">Problem</div><div class="body"><a href="${esc(r.erdos_url)}">erdosproblems.com/${r.problem}</a></div></li>`);
+  if(r.fc_url) chain.push(`<li class="on"><div class="step">Formal statement</div><div class="body"><a href="${esc(r.fc_url)}" class="mono">${esc(r.fc_theorem||"Formal Conjectures")}</a></div></li>`);
+  const links = (r.proof_links&&r.proof_links.length) ? r.proof_links : (r.proof_link?[{url:r.proof_link,label:"hosted proof"}]:[]);
+  if(links.length) chain.push(`<li class="${r.machine_verdict?"on":""}"><div class="step">Hosted proof${links.length>1?"s":""}</div><div class="body">`
+    + links.map(p => `<a href="${esc(p.url||p.link)}" class="mono">${esc(p.label||p.source||"proof")}</a>${p.conditional?' <span class="tag cond" style="font-size:.7rem">conditional</span>':""}`).join("<br>")
+    + `</div></li>`);
+  const foot = r.machine_verdict==="conditional"
+    ? (r.named_assumptions.map(condName).concat(r.non_kernel_axioms)).map(x=>`<span class="mono cond" style="color:var(--accent)">${esc(x)}</span>`).join(", ")
+    : (r.machine_verdict==="unconditional" ? "kernel axioms only (propext, Classical.choice, Quot.sound)" : "—");
+  chain.push(`<li class="${r.machine_verdict==="conditional"?"on":""}"><div class="step">Axiom footprint</div><div class="body">${foot}</div></li>`);
+  if(r.signed_fidelity_verdict) chain.push(`<li class="on"><div class="step">Signed statement verdict</div><div class="body">${esc(r.signed_fidelity_verdict)}${r.signed_by?" · "+esc(r.signed_by):""}</div></li>`);
+
+  // load-bearing neighborhood
+  const mine = conds.filter(cd => cd.problems.includes(r.problem));
+  const neigh = mine.length ? mine.map(cd => {
+    const sibs = cd.problems.filter(p => p!==r.problem);
+    const also = sibs.length ? ` — also assumed by ${sibs.map(p=>`<a href="finding.html?n=${p}">${p}</a>`).join(" ")}` : " — unique to this proof";
+    return `<div class="neighbor"><span class="cn">${esc(cd.name)}</span>${also} · <a href="conditions.html">map</a></div>`;
+  }).join("") : `<p class="muted">This proof assumes nothing beyond Lean's kernel.</p>`;
+
+  // recorded claims
+  let claims = "";
+  if(r.wiki_outcome){
+    const ai = (r.wiki_ai_systems||[]).join(", ");
+    claims += `<div class="claim">${COLOR[r.wiki_color]||""} AI-contributions wiki: ${esc(r.wiki_outcome)}`
+      + (ai?`<span class="ai"> — ${esc(ai)}</span>`:"")+`</div>`;
+  }
+  if(r.gpt_erdos) claims += `<div class="claim">gpt-erdos review: ${esc(GPT[r.gpt_erdos]||r.gpt_erdos)}</div>`;
+  if(!claims) claims = `<p class="muted">No external claim recorded.</p>`;
+
+  c.innerHTML =
+    `<h1>Erdős Problem ${r.problem}</h1>`
+    + `<p class="sub">${esc(r.erdos_state || "")}${r.fc_theorem?` · <span class="mono">${esc(r.fc_theorem)}</span>`:""}</p>`
+    + `<p class="links"><a href="${esc(r.erdos_url)}">erdosproblems.com</a>`
+    + `<a href="https://www.erdosproblems.com/forum/thread/${r.problem}">forum thread</a>${fcLink}</p>`
+
+    + `<div class="ribbon">`
+    + `<div class="cell"><div class="k">Proof · Axis 1 (mechanical)</div><div class="v">${proof.tag}</div><div class="d">${proof.detail}</div></div>`
+    + `<div class="cell"><div class="k">Statement · Axis 2 (signed)</div><div class="v">${stmt.tag}</div><div class="d">${stmt.detail}</div></div>`
+    + `<div class="cell wide"><div class="k">Provenance</div><div class="d">${src}${fidsrc}${r.discrepancy?' · <span style="color:var(--accent)">recorded as solved, proof is conditional</span>':""}</div></div>`
+    + `<div class="cell wide"><div class="k">Reproduce</div><div class="repro">${esc(reproCmd)}</div></div>`
+    + `</div>`
+
+    + `<h2>Proof chain</h2><ul class="chain">${chain.join("")}</ul>`
+    + `<h2>Load-bearing conditions</h2>${neigh}`
+    + `<h2>Recorded claims</h2>${claims}`
+    + `<p class="foot">The proof side is mechanical and reproducible; the statement verdict is signed by a named reviewer. `
+    + `<a href="index.html">Overview</a> · <a href="conditions.html">Conditions</a> · <a href="verdicts.json">feed</a></p>`;
+}
+
+(function(){
+  const n = Number(new URLSearchParams(location.search).get("n"));
+  fetch("verdicts.json").then(r=>r.json()).then(d=>{
+    const r = d.rows.find(x => x.problem===n);
+    if(!r){ document.getElementById("content").innerHTML =
+      `<h1>Problem ${n||"?"}</h1><p class="muted">Not in the audit feed. <a href="index.html">Browse all problems.</a></p>`; return; }
+    render(r, d.summary.conditions || []);
+  });
+})();
+</script>
+</body>
+</html>

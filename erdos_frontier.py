@@ -1036,6 +1036,92 @@ def render_next_batch_md(payload: dict, *, top_count: int = 20, batch_size: int 
     return "\n".join(out)
 
 
+# Recognizable named theorems an Erdős proof may assume without proving (as an
+# axiom or as a hypothesis parameter). Keyed by the axiom identifier or the
+# hypothesis type-head. `family` merges different formulations of the same input
+# (e.g. the Maynard–Tao axiom and its Banks–Freiberg–Turnage-Butterbaugh corollary)
+# so leverage counts the distinct problems that rest on one mathematical result.
+# Descriptions are kept only where confidently known; a blank one shows just the
+# name. Anything not listed is treated as a problem-internal hypothesis, not a
+# load-bearing external input.
+CONDITION_META: dict[str, tuple[str, str | None, str]] = {
+    "maynard_tao": ("Maynard–Tao theorem", "maynard-tao",
+                    "Consecutive primes in arithmetic progressions (bounded gaps)."),
+    "maynardTaoBFT": ("Maynard–Tao theorem", "maynard-tao",
+                      "Banks–Freiberg–Turnage-Butterbaugh corollary of Maynard–Tao."),
+    "tao_teravainen": ("Tao–Teräväinen theorem", None,
+                       "Bound on the number of prime factors of nearby integers."),
+    "Finset.add_kneser": ("Kneser's theorem", None,
+                          "Lower bound for the size of a sumset."),
+    "mertens_product": ("Mertens' product theorem", None, ""),
+    "linnik_dvd": ("Linnik's theorem", None, "Least prime in an arithmetic progression."),
+    "shiu_consecutive_primes": ("Shiu's theorem", None,
+                                "Strings of consecutive primes in a progression."),
+    "Pollack17.theorem_1_3": ("Pollack (2017), Theorem 1.3", None, ""),
+    "bernays": ("bernays", None, ""),
+    "DukeTheoremStatement": ("Duke's theorem", None, ""),
+    "PNT_statement": ("Prime Number Theorem", None, ""),
+    "GoldstonGrahamPintzYildirimStatement": ("Goldston–Graham–Pintz–Yıldırım", None, ""),
+    "EremenkoLempertAtZeroStatement": ("Eremenko–Lempert theorem", None, ""),
+}
+
+
+def _assumption_head(text: str) -> str:
+    """'h_duke : Erdos1148.DukeTheoremStatement x' -> 'DukeTheoremStatement'."""
+    typ = text.split(" : ", 1)[-1]
+    return typ.split(".")[-1].split(" ")[0].split("(")[0]
+
+
+def _clean_condition_name(raw: str) -> str:
+    """Strip a leading problem namespace (e.g. 'Erdos1197.') for display."""
+    return re.sub(r"^Erdos_?\d+\w*\.", "", raw)
+
+
+def compute_conditions(rows: list[dict]) -> list[dict]:
+    """Group conditional proofs by the unproven input each one declares.
+
+    The load-bearing map: axiom conditions (from ``#print axioms``) and the
+    recognizable named-theorem hypotheses are external results the frontier rests
+    on — formalizing one clears every problem that assumes it. Problem-internal
+    hypotheses and ``native_decide`` trust are surfaced in their own tiers so the
+    map never dresses a routine hypothesis up as a load-bearing theorem.
+    """
+    groups: dict[str, dict] = {}
+
+    def bump(key: str, name: str, kind: str, tier: str, desc: str, problem: int) -> None:
+        g = groups.setdefault(key, {"key": key, "name": name, "kind": kind,
+                                    "tier": tier, "description": desc, "problems": set()})
+        g["problems"].add(problem)
+
+    for r in rows:
+        if r["machine_verdict"] != "conditional":
+            continue
+        for ax in r["non_kernel_axioms"]:
+            if "native_decide" in ax or "._native." in ax:
+                bump("native_decide", "native_decide (trusted native evaluation)",
+                     "compiler", "compiler",
+                     "The proof trusts a native-compiled computation, not a kernel proof.",
+                     r["problem"])
+                continue
+            name, family, desc = CONDITION_META.get(ax, (_clean_condition_name(ax), None, ""))
+            bump(family or ax, name, "axiom", "theorem", desc, r["problem"])
+        for h in r["named_assumptions"]:
+            head = _assumption_head(h)
+            meta = CONDITION_META.get(head)
+            if meta:
+                name, family, desc = meta
+                bump(family or head, name, "hypothesis", "theorem", desc, r["problem"])
+            else:
+                bump(head, _clean_condition_name(head), "hypothesis", "hypothesis", "", r["problem"])
+
+    tier_rank = {"theorem": 0, "hypothesis": 1, "compiler": 2}
+    out = [{"key": g["key"], "name": g["name"], "kind": g["kind"], "tier": g["tier"],
+            "description": g["description"], "problems": sorted(g["problems"]),
+            "leverage": len(g["problems"])} for g in groups.values()]
+    out.sort(key=lambda c: (tier_rank.get(c["tier"], 9), -c["leverage"], c["name"].lower()))
+    return out
+
+
 def render_verdicts_feed(payload: dict) -> dict:
     """The public audit feed: which formally-solved Erdős claims are actually
     unconditional. One row per problem, joining the machine L1 verdict, the FC/
@@ -1119,6 +1205,9 @@ def render_verdicts_feed(payload: dict) -> dict:
                  "gpt_erdos": r["gpt_erdos"]}
                 for r in rows if r["gpt_erdos"] is not None and r["machine_verdict"] is not None
             ],
+            # the load-bearing condition map: the unproven inputs the conditional
+            # proofs declare, grouped so leverage counts the problems each unlocks.
+            "conditions": compute_conditions(rows),
         },
         "rows": rows,
     }

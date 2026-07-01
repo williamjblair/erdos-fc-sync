@@ -26,6 +26,9 @@
   .lede code{ background:var(--accent-bg); padding:.05rem .3rem; border-radius:2px; }
   a{ color:inherit; text-decoration-color:var(--hair); text-underline-offset:2px; }
   a:hover{ text-decoration-color:var(--accent); }
+  .nav{ font-size:.85rem; color:var(--faint); margin-bottom:2.2rem; }
+  .nav a{ margin-right:1.1rem; }
+  .nav a.here{ color:var(--ink); text-decoration-color:var(--accent); }
 
   .axes{ display:flex; flex-wrap:wrap; gap:1rem; margin:0 0 2.6rem; max-width:44rem; }
   .axis{ flex:1 1 18rem; border:1px solid var(--hair); border-radius:4px; padding:.9rem 1rem; }
@@ -131,6 +134,7 @@
 </head>
 <body>
 <div class="wrap">
+  <div class="nav"><a class="here" href="index.html">Overview</a><a href="conditions.html">Load-bearing conditions</a></div>
   <h1>Erdős formal-proof fidelity audit</h1>
   <p class="dek">Which “formally solved” Erdős problems rest on an <em>unconditional</em> Lean proof, and which silently assume an unproven result.</p>
 
@@ -140,7 +144,9 @@
   only under an unproven assumption. A proof can be <code>sorry</code>-free and <code>#print axioms</code>-clean
   and still prove the problem only <em>conditionally</em>, by taking a deep theorem as a hypothesis parameter
   the axiom check never sees. The machine layer carries no human or model judgment; a statement-fidelity
-  verdict carries a named reviewer.</p>
+  verdict carries a named reviewer. Each problem opens a <a href="finding.html?n=997">finding page</a> with
+  its full trust vector; the <a href="conditions.html">conditions map</a> shows the unproven inputs the
+  frontier rests on.</p>
 
   <div class="axes">
     <div class="axis">
@@ -182,7 +188,7 @@
   </div>
 
   <div class="controls">
-    <input id="q" type="search" placeholder="problem #…" autocomplete="off">
+    <input id="q" type="search" placeholder="#, axiom, wiki, gpt-erdos…" autocomplete="off">
     <span class="chip disc" data-f="discrepancy">discrepancy</span>
     <span class="chip on" data-f="audited">audited</span>
     <span class="chip" data-f="conditional">conditional</span>
@@ -305,6 +311,7 @@ function detail(r){
   }
   // links
   const links = [
+    link(`finding.html?n=${r.problem}`, "finding page →"),
     link(r.erdos_url, "erdosproblems.com"),
     link(`https://www.erdosproblems.com/forum/thread/${r.problem}`, "forum thread"),
     link(r.fc_url, "Formal Conjectures"),
@@ -320,7 +327,15 @@ function td(label, cls, html){ return `<td class="${cls}" data-label="${label}">
 function render(){
   const q = document.getElementById("q").value.trim();
   let rows = DATA.rows.filter(FILTERS[filter]);
-  if(q) rows = rows.filter(r => String(r.problem).includes(q));
+  if(q){
+    const ql = q.toLowerCase();
+    rows = rows.filter(r =>
+      String(r.problem).includes(q)
+      || (r.non_kernel_axioms||[]).some(a => a.toLowerCase().includes(ql))
+      || (r.named_assumptions||[]).some(a => a.toLowerCase().includes(ql))
+      || (r.wiki_outcome||"").toLowerCase().includes(ql)
+      || (r.gpt_erdos||"").toLowerCase().includes(ql));
+  }
   rows.sort((a,b) => {
     if(a.discrepancy !== b.discrepancy) return a.discrepancy ? -1 : 1;
     const rank = v => v==="conditional"?0 : v==="incomplete"?1 : v==="unconditional"?2 : 3;

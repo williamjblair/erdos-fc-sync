@@ -41616,6 +41616,285 @@
       1148,
       1187
     ],
+    "conditions": [
+      {
+        "description": "Lower bound for the size of a sumset.",
+        "key": "Finset.add_kneser",
+        "kind": "axiom",
+        "leverage": 2,
+        "name": "Kneser's theorem",
+        "problems": [
+          433,
+          434
+        ],
+        "tier": "theorem"
+      },
+      {
+        "description": "Consecutive primes in arithmetic progressions (bounded gaps).",
+        "key": "maynard-tao",
+        "kind": "axiom",
+        "leverage": 2,
+        "name": "Maynard\u2013Tao theorem",
+        "problems": [
+          237,
+          997
+        ],
+        "tier": "theorem"
+      },
+      {
+        "description": "",
+        "key": "bernays",
+        "kind": "axiom",
+        "leverage": 1,
+        "name": "bernays",
+        "problems": [
+          659
+        ],
+        "tier": "theorem"
+      },
+      {
+        "description": "",
+        "key": "Erdos1197.bm_approx_data",
+        "kind": "axiom",
+        "leverage": 1,
+        "name": "bm_approx_data",
+        "problems": [
+          1197
+        ],
+        "tier": "theorem"
+      },
+      {
+        "description": "",
+        "key": "DukeTheoremStatement",
+        "kind": "hypothesis",
+        "leverage": 1,
+        "name": "Duke's theorem",
+        "problems": [
+          1148
+        ],
+        "tier": "theorem"
+      },
+      {
+        "description": "",
+        "key": "EremenkoLempertAtZeroStatement",
+        "kind": "hypothesis",
+        "leverage": 1,
+        "name": "Eremenko\u2013Lempert theorem",
+        "problems": [
+          115
+        ],
+        "tier": "theorem"
+      },
+      {
+        "description": "",
+        "key": "GoldstonGrahamPintzYildirimStatement",
+        "kind": "hypothesis",
+        "leverage": 1,
+        "name": "Goldston\u2013Graham\u2013Pintz\u2013Y\u0131ld\u0131r\u0131m",
+        "problems": [
+          964
+        ],
+        "tier": "theorem"
+      },
+      {
+        "description": "Least prime in an arithmetic progression.",
+        "key": "linnik_dvd",
+        "kind": "axiom",
+        "leverage": 1,
+        "name": "Linnik's theorem",
+        "problems": [
+          694
+        ],
+        "tier": "theorem"
+      },
+      {
+        "description": "",
+        "key": "mertens_product",
+        "kind": "axiom",
+        "leverage": 1,
+        "name": "Mertens' product theorem",
+        "problems": [
+          694
+        ],
+        "tier": "theorem"
+      },
+      {
+        "description": "",
+        "key": "Pollack17.theorem_1_3",
+        "kind": "axiom",
+        "leverage": 1,
+        "name": "Pollack (2017), Theorem 1.3",
+        "problems": [
+          1141
+        ],
+        "tier": "theorem"
+      },
+      {
+        "description": "",
+        "key": "PNT_statement",
+        "kind": "hypothesis",
+        "leverage": 1,
+        "name": "Prime Number Theorem",
+        "problems": [
+          1100
+        ],
+        "tier": "theorem"
+      },
+      {
+        "description": "Strings of consecutive primes in a progression.",
+        "key": "shiu_consecutive_primes",
+        "kind": "axiom",
+        "leverage": 1,
+        "name": "Shiu's theorem",
+        "problems": [
+          427
+        ],
+        "tier": "theorem"
+      },
+      {
+        "description": "Bound on the number of prime factors of nearby integers.",
+        "key": "tao_teravainen",
+        "kind": "axiom",
+        "leverage": 1,
+        "name": "Tao\u2013Ter\u00e4v\u00e4inen theorem",
+        "problems": [
+          258
+        ],
+        "tier": "theorem"
+      },
+      {
+        "description": "",
+        "key": "CirclesNonseparable",
+        "kind": "hypothesis",
+        "leverage": 1,
+        "name": "CirclesNonseparable",
+        "problems": [
+          1121
+        ],
+        "tier": "hypothesis"
+      },
+      {
+        "description": "",
+        "key": "ConvexPosition",
+        "kind": "hypothesis",
+        "leverage": 1,
+        "name": "ConvexPosition",
+        "problems": [
+          94
+        ],
+        "tier": "hypothesis"
+      },
+      {
+        "description": "",
+        "key": "DecidableDistinctSubsetSums",
+        "kind": "hypothesis",
+        "leverage": 1,
+        "name": "DecidableDistinctSubsetSums",
+        "problems": [
+          350
+        ],
+        "tier": "hypothesis"
+      },
+      {
+        "description": "",
+        "key": "Erdos281Hyp",
+        "kind": "hypothesis",
+        "leverage": 1,
+        "name": "Erdos281Hyp",
+        "problems": [
+          281
+        ],
+        "tier": "hypothesis"
+      },
+      {
+        "description": "",
+        "key": "exact_complements",
+        "kind": "hypothesis",
+        "leverage": 1,
+        "name": "exact_complements",
+        "problems": [
+          785
+        ],
+        "tier": "hypothesis"
+      },
+      {
+        "description": "",
+        "key": "HasDisjointUnitDecomps",
+        "kind": "hypothesis",
+        "leverage": 1,
+        "name": "HasDisjointUnitDecomps",
+        "problems": [
+          296
+        ],
+        "tier": "hypothesis"
+      },
+      {
+        "description": "",
+        "key": "is_adjacent",
+        "kind": "hypothesis",
+        "leverage": 1,
+        "name": "is_adjacent",
+        "problems": [
+          1080
+        ],
+        "tier": "hypothesis"
+      },
+      {
+        "description": "",
+        "key": "NoObtuse",
+        "kind": "hypothesis",
+        "leverage": 1,
+        "name": "NoObtuse",
+        "problems": [
+          224
+        ],
+        "tier": "hypothesis"
+      },
+      {
+        "description": "",
+        "key": "Prime",
+        "kind": "hypothesis",
+        "leverage": 1,
+        "name": "Prime",
+        "problems": [
+          1187
+        ],
+        "tier": "hypothesis"
+      },
+      {
+        "description": "",
+        "key": "PrimitiveSet",
+        "kind": "hypothesis",
+        "leverage": 1,
+        "name": "PrimitiveSet",
+        "problems": [
+          164
+        ],
+        "tier": "hypothesis"
+      },
+      {
+        "description": "",
+        "key": "zero_Point",
+        "kind": "hypothesis",
+        "leverage": 1,
+        "name": "zero_Point",
+        "problems": [
+          1080
+        ],
+        "tier": "hypothesis"
+      },
+      {
+        "description": "The proof trusts a native-compiled computation, not a kernel proof.",
+        "key": "native_decide",
+        "kind": "compiler",
+        "leverage": 1,
+        "name": "native_decide (trusted native evaluation)",
+        "problems": [
+          418
+        ],
+        "tier": "compiler"
+      }
+    ],
     "cross_reference": [
       {
         "gpt_erdos": "new_proof",
