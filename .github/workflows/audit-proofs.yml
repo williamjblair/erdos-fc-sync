@@ -53,6 +53,7 @@ jobs:
           mkdir -p proof-repos
           git clone --depth 1 https://github.com/williamjblair/lean-proofs-fork.git proof-repos/plby
           git clone --depth 1 https://github.com/google-deepmind/alphaproof-nexus-results.git proof-repos/alphaproof
+          git clone --depth 1 https://github.com/Jayyhk/erdos-lean.git proof-repos/jayyhk
 
       # Build ONLY the ErdosProblems library (the aggregate ErdosProblems.All), not
       # the fork's default "All" target — that also pulls HundredTheorems / MathOverflow
@@ -70,6 +71,13 @@ jobs:
           lake exe cache get || true
           lake build APNOutputs
 
+      # Jayyhk hosts one lake project per problem, each pinned to its own toolchain.
+      # Build only the groups whose toolchain we already provisioned above (v4.29.1
+      # for plby, v4.27.0 for alphaproof) so the Mathlib downloads are reused. The
+      # other ~10 toolchain groups are a heavier, incremental follow-on.
+      - name: Build Jayyhk groups matching plby/alphaproof (v4.29.1, v4.27.0)
+        run: JAYYHK="$GITHUB_WORKSPACE/proof-repos/jayyhk" bash lean/build-jayyhk.sh v4.29.1 v4.27.0
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -82,9 +90,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VELA_PROOF_REPO: ${{ github.workspace }}/proof-repos/plby/src/v4.29.1
           VELA_PROOF_REPO_ALPHAPROOF: ${{ github.workspace }}/proof-repos/alphaproof
+          VELA_PROOF_REPO_JAYYHK: ${{ github.workspace }}/proof-repos/jayyhk
         run: |
           uv run python lean/extract_assumptions.py --repo plby
           uv run python lean/extract_assumptions.py --repo alphaproof
+          uv run python lean/extract_assumptions.py --repo jayyhk
           uv run python erdos_frontier.py
           uv run pytest -q
 
