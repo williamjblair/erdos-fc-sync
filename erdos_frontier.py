@@ -1077,6 +1077,10 @@ CONDITION_META: dict[str, tuple[str, str | None, str]] = {
     "shiu_consecutive_primes": ("Shiu's theorem", None,
                                 "Strings of consecutive primes in a progression."),
     "Pollack17.theorem_1_3": ("Pollack (2017), Theorem 1.3", None, ""),
+    "golod_shafarevich_inequality": ("Golod–Shafarevich inequality", "golod-shafarevich",
+                                     "Rank-of-relations bound for finitely presented groups/algebras."),
+    "shafarevich_relation_rank_bound": ("Golod–Shafarevich inequality", "golod-shafarevich",
+                                        "Rank-of-relations bound for finitely presented groups/algebras."),
     "bernays": ("bernays", None, ""),
     "DukeTheoremStatement": ("Duke's theorem", None, ""),
     "PNT_statement": ("Prime Number Theorem", None, ""),
@@ -1122,8 +1126,10 @@ def compute_conditions(rows: list[dict]) -> list[dict]:
                      "The proof trusts a native-compiled computation, not a kernel proof.",
                      r["problem"])
                 continue
-            name, family, desc = CONDITION_META.get(ax, (_clean_condition_name(ax), None, ""))
-            bump(family or ax, name, "axiom", "theorem", desc, r["problem"])
+            cleaned = _clean_condition_name(ax)
+            meta = CONDITION_META.get(ax) or CONDITION_META.get(cleaned)
+            name, family, desc = meta if meta else (cleaned, None, "")
+            bump(family or cleaned, name, "axiom", "theorem", desc, r["problem"])
         for h in r["named_assumptions"]:
             head = _assumption_head(h)
             meta = CONDITION_META.get(head)

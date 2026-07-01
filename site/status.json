@@ -19,6 +19,7 @@
   },
   "coverage_gap": [],
   "discrepancies": [
+    90,
     258,
     281,
     659,
@@ -3088,7 +3089,7 @@
       "bucket": "docstring",
       "candidate_claims": null,
       "claims": [],
-      "discrepancy": false,
+      "discrepancy": true,
       "erdos_state": "disproved (Lean)",
       "erdos_url": "https://www.erdosproblems.com/90",
       "fc": {
@@ -3103,7 +3104,15 @@
       "fidelity": null,
       "held_for_review": false,
       "latex_url": "https://www.erdosproblems.com/latex/90",
-      "machine": null,
+      "machine": {
+        "named_assumptions": [],
+        "non_kernel_axioms": [
+          "Erdos90.golod_shafarevich_inequality",
+          "Erdos90.shafarevich_relation_rank_bound"
+        ],
+        "source": "jayyhk",
+        "verdict": "conditional"
+      },
       "override": null,
       "problem": 90,
       "proof_links": [
@@ -22149,7 +22158,12 @@
       "fidelity": null,
       "held_for_review": false,
       "latex_url": "https://www.erdosproblems.com/latex/613",
-      "machine": null,
+      "machine": {
+        "named_assumptions": [],
+        "non_kernel_axioms": [],
+        "source": "jayyhk",
+        "verdict": "unconditional"
+      },
       "override": {
         "bucket": "blocked-claim",
         "reason": "Claimed by Paul-Lez in an FC issue comment.",

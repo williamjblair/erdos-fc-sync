@@ -2971,7 +2971,7 @@
     },
     {
       "bucket": "docstring",
-      "discrepancy": false,
+      "discrepancy": true,
       "erdos_state": "disproved (Lean)",
       "erdos_url": "https://www.erdosproblems.com/90",
       "fc_has_proof": false,
@@ -2982,10 +2982,13 @@
       "fidelity_source": null,
       "gpt_erdos": null,
       "held_for_review": false,
-      "machine_source": null,
-      "machine_verdict": null,
+      "machine_source": "jayyhk",
+      "machine_verdict": "conditional",
       "named_assumptions": [],
-      "non_kernel_axioms": [],
+      "non_kernel_axioms": [
+        "Erdos90.golod_shafarevich_inequality",
+        "Erdos90.shafarevich_relation_rank_bound"
+      ],
       "problem": 90,
       "proof_link": null,
       "proof_links": [
@@ -21009,8 +21012,8 @@
       "fidelity_source": null,
       "gpt_erdos": null,
       "held_for_review": false,
-      "machine_source": null,
-      "machine_verdict": null,
+      "machine_source": "jayyhk",
+      "machine_verdict": "unconditional",
       "named_assumptions": [],
       "non_kernel_axioms": [],
       "problem": 613,
@@ -41648,7 +41651,7 @@
       },
       {
         "description": "",
-        "key": "Erdos1197.bm_approx_data",
+        "key": "bm_approx_data",
         "kind": "axiom",
         "leverage": 1,
         "name": "bm_approx_data",
@@ -41687,6 +41690,17 @@
         "name": "Goldston\u2013Graham\u2013Pintz\u2013Y\u0131ld\u0131r\u0131m",
         "problems": [
           964
+        ],
+        "tier": "theorem"
+      },
+      {
+        "description": "Rank-of-relations bound for finitely presented groups/algebras.",
+        "key": "golod-shafarevich",
+        "kind": "axiom",
+        "leverage": 1,
+        "name": "Golod\u2013Shafarevich inequality",
+        "problems": [
+          90
         ],
         "tier": "theorem"
       },
@@ -41900,6 +41914,7 @@
       }
     ],
     "discrepancies": [
+      90,
       258,
       281,
       659,
@@ -41911,7 +41926,7 @@
     ],
     "gpt_erdos_problems": 57,
     "held_for_review": [],
-    "machine_conditional": 23,
+    "machine_conditional": 24,
     "problems": 1217,
     "signed_fidelity": [
       {

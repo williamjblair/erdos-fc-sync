@@ -1,0 +1,50 @@
+[
+  {
+    "problem": 90,
+    "erdos_url": "https://www.erdosproblems.com/90",
+    "headline_decl": "Erdos90.erdos_90",
+    "machine_verdict": "conditional",
+    "axiom_verdict": "non_kernel_axioms",
+    "non_kernel_axioms": [
+      "Erdos90.golod_shafarevich_inequality",
+      "Erdos90.shafarevich_relation_rank_bound"
+    ],
+    "named_assumptions": [],
+    "preconditions": [],
+    "declared_state": "axiomatic",
+    "all_decls": {
+      "Erdos90.erdos_90": "conditional"
+    }
+  },
+  {
+    "problem": 296,
+    "erdos_url": "https://www.erdosproblems.com/296",
+    "headline_decl": "Erdos296.erdos_296",
+    "machine_verdict": "unconditional",
+    "axiom_verdict": "kernel_clean",
+    "non_kernel_axioms": [],
+    "named_assumptions": [],
+    "preconditions": [
+      "a : 0 < \u03b5",
+      "a : \u03b5 < 1"
+    ],
+    "declared_state": "complete",
+    "all_decls": {
+      "Erdos296.erdos_296": "unconditional"
+    }
+  },
+  {
+    "problem": 613,
+    "erdos_url": "https://www.erdosproblems.com/613",
+    "headline_decl": "Erdos613.erdos_613",
+    "machine_verdict": "unconditional",
+    "axiom_verdict": "kernel_clean",
+    "non_kernel_axioms": [],
+    "named_assumptions": [],
+    "preconditions": [],
+    "declared_state": "complete",
+    "all_decls": {
+      "Erdos613.erdos_613": "unconditional"
+    }
+  }
+]
