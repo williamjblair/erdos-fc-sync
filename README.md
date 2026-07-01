@@ -33,6 +33,12 @@ authored. You do not have to trust the dashboard:
 vela check . --strict     # replays the event log, verifies every signature
 ```
 
+To sign a new statement-fidelity verdict (a reviewer key, never an agent):
+
+```bash
+bash scripts/sign-fidelity.sh <problem> <faithful|variant|unfaithful> "<note>" --sign
+```
+
 See [VISION.md](VISION.md) for the two layers and the trust rule.
 
 ## The proof-status join: drift
