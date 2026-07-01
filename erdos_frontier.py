@@ -1282,9 +1282,60 @@ def load_live_status(overrides_path: str | Path = "overrides.yaml") -> dict:
     )
 
 
+def write_sources_lock(root: str | Path = ".") -> dict:
+    """Record the exact content hash (+ GitHub commit, where resolvable) of every
+    live source into ``sources.lock.json``, so the materialized state is traceable
+    to fixed snapshots rather than a floating ``main``. Network failures degrade to
+    a recorded error rather than aborting the run.
+    """
+    import hashlib
+    root = Path(root)
+    registry = (yaml.safe_load((root / "sources.yaml").read_text()) or {}).get("sources", {})
+    headers = claims_headers()
+    locked: dict[str, dict] = {}
+    for name, spec in registry.items():
+        entry: dict = {"kind": spec.get("kind")}
+        if spec.get("repo"):
+            entry["repo"] = spec["repo"]
+        try:
+            if spec.get("url"):
+                data = fetch(spec["url"])
+                entry["url"] = spec["url"]
+                entry["sha256"] = "sha256:" + hashlib.sha256(data).hexdigest()
+                if spec.get("repo") and spec.get("ref"):
+                    try:
+                        commit = json.loads(fetch(
+                            f"https://api.github.com/repos/{spec['repo']}/commits/{spec['ref']}",
+                            headers))
+                        entry["ref"] = spec["ref"]
+                        entry["commit"] = commit.get("sha")
+                    except (urllib.error.URLError, json.JSONDecodeError):
+                        pass
+            elif spec.get("kind") == "statement_attestations" and (root / "frontier.json").exists():
+                entry["home"] = "self (.vela/ -> frontier.json)"
+                entry["sha256"] = "sha256:" + hashlib.sha256(
+                    (root / "frontier.json").read_bytes()).hexdigest()
+            elif spec.get("path") and (root / spec["path"]).exists():
+                entry["path"] = spec["path"]
+                entry["sha256"] = "sha256:" + hashlib.sha256(
+                    (root / spec["path"]).read_bytes()).hexdigest()
+        except (urllib.error.URLError, OSError) as exc:
+            entry["error"] = str(exc)
+        locked[name] = entry
+    stamp = _datetime.datetime.now(_datetime.timezone.utc).replace(microsecond=0).isoformat()
+    out = {"generated_at": stamp, "sources": locked}
+    (root / "sources.lock.json").write_text(json.dumps(out, indent=2, sort_keys=True) + "\n")
+    return out
+
+
 def main() -> int:
     payload = load_live_status()
     write_outputs(payload, "site")
+    try:
+        write_sources_lock(".")
+    except OSError as exc:
+        import sys
+        sys.stderr.write(f"WARNING: could not write sources.lock.json ({exc})\n")
     print(
         f"reconciled {payload['total_problems']} problems; "
         f"claims_available={payload['claims_available']}; "
