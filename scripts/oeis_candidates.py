@@ -51,8 +51,9 @@ def oeis_search(query: str) -> list[dict]:
         doc = json.loads(fetch(url))
     except Exception:
         return []
+    results = doc if isinstance(doc, list) else (doc.get("results") or [])
     return [{"anum": f"A{r['number']:06d}", "name": r.get("name", "")}
-            for r in (doc.get("results") or [])[:4]]
+            for r in results[:4] if isinstance(r, dict) and "number" in r]
 
 
 def main() -> int:
